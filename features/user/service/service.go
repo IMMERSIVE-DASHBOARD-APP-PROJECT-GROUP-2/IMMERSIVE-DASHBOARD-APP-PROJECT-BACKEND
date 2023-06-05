@@ -40,6 +40,12 @@ func (service *userService) Create(user *user.Core) error {
 	return nil
 }
 
+// GetAllUser implements user.UserServiceInterface.
+func (repo *userService) GetAllUser() ([]user.Core, error) {
+	data, err := repo.userData.GetAllUser()
+	return data, err
+}
+
 // Login implements user.UserServiceInterface.
 func (repo *userService) Login(email string, password string) (user.Core, string, error) {
 	if email == "" || password == "" {

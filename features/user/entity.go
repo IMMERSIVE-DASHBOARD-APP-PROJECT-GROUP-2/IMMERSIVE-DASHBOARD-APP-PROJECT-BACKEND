@@ -34,14 +34,17 @@ type Core struct {
 	Role      UserRole
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	DeletedAt time.Time
 }
 
 type UserDataInterface interface {
 	Insert(user *Core) error
 	Login(email, password string) (Core, string, error)
+	GetAllUser() ([]Core, error)
 }
 
 type UserServiceInterface interface {
 	Create(user *Core) error
 	Login(email, password string) (Core, string, error)
+	GetAllUser() ([]Core, error)
 }

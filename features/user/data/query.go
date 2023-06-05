@@ -39,6 +39,36 @@ func (repo *userQuery) Insert(user *user.Core) error {
 	return nil
 }
 
+// GetAllUser implements user.UserDataInterface.
+func (repo *userQuery) GetAllUser() ([]user.Core, error) {
+	var userData []User
+	tx := repo.db.Find(&userData) // select * from users
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	// mapping dari struct gorm model ke struct entities core
+	var usersCoreAll []user.Core
+	for _, value := range userData {
+		var userCore = user.Core{
+			Id:        value.ID,
+			Name:      value.Name,
+			Phone:     value.Phone,
+			Email:     value.Email,
+			Password:  value.Password,
+			Status:    user.UserStatus(value.Status),
+			Team:      user.UserTeam(value.Team),
+			Role:      user.UserRole(value.Role),
+			CreatedAt: value.CreatedAt,
+			UpdatedAt: value.UpdatedAt,
+			DeletedAt: value.DeletedAt.Time,
+		}
+		usersCoreAll = append(usersCoreAll, userCore)
+	}
+
+	return usersCoreAll, nil
+}
+
 // Login implements user.UserDataInterface.
 func (repo *userQuery) Login(email string, password string) (user.Core, string, error) {
 	var userData User
