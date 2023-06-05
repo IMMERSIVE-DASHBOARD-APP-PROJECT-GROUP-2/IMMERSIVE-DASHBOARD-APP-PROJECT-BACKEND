@@ -37,11 +37,11 @@ type Core struct {
 }
 
 type UserDataInterface interface {
+	Insert(user *Core) error
 	Login(email, password string) (Core, string, error)
-	// Insert(user *Core) error
 }
 
 type UserServiceInterface interface {
+	Create(user *Core) error
 	Login(email, password string) (Core, string, error)
-	// Create(user *Core) error
 }

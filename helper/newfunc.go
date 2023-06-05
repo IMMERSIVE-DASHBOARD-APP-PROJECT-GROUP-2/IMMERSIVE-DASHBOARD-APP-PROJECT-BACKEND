@@ -1,6 +1,8 @@
 package helper
 
-import "github.com/DASHBOARDAPP/features/user"
+import (
+	"github.com/DASHBOARDAPP/features/user"
+)
 
 // Konstruktor untuk tipe UserRole
 func NewUserRole(role string) user.UserRole {

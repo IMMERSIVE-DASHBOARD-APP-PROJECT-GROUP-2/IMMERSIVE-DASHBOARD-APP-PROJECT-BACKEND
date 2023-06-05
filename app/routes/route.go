@@ -20,6 +20,7 @@ func InitRoute(e *echo.Echo, db *gorm.DB) {
 
 	// User Routes
 
+	e.POST("/users", userHandlerAPI.CreateUser)
 	e.POST("/login", userHandlerAPI.Login)
 
 }

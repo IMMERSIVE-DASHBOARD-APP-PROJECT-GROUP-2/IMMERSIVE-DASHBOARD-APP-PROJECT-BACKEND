@@ -2,10 +2,12 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
 	"unicode"
 
 	"github.com/DASHBOARDAPP/features/user"
+	"github.com/DASHBOARDAPP/helper"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -14,10 +16,29 @@ type userService struct {
 	validate *validator.Validate
 }
 
-// Create implements user.UserServiceInterface.
-// func (*userService) Create(user *user.Core) error {
-// 	panic("unimplemented")
-// }
+func (service *userService) Create(user *user.Core) error {
+	// Lakukan validasi jika hanya admin atau manager yang dapat menambahkan pengguna
+	if user.Role != helper.NewUserRole("admin") && user.Team != helper.NewUserTeam("manager") {
+		return fmt.Errorf("only admin and manager can add users")
+	}
+
+	// Hash password sebelum disimpan
+	hashedPassword, err := helper.HashPassword(user.Password)
+	if err != nil {
+		return err
+	}
+
+	// Mengganti password dengan hashed password
+	user.Password = hashedPassword
+
+	// Insert the user data into the database
+	err = service.userData.Insert(user)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 // Login implements user.UserServiceInterface.
 func (repo *userService) Login(email string, password string) (user.Core, string, error) {
