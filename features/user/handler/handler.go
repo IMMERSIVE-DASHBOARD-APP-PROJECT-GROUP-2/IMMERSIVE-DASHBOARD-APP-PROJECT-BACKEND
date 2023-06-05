@@ -42,3 +42,24 @@ func (handler *UserHandler) Login(c echo.Context) error {
 		"role":  userData.Role,
 	}))
 }
+
+func (handler *UserHandler) GetAllUser(c echo.Context) error {
+	//Memanggil function di Service logic via interface
+	results, err := handler.userService.GetAllUser()
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponse("error read data user"))
+	}
+
+	var userResponse []UserResponse
+	for _, value := range results {
+		userResponse = append(userResponse, UserResponse{
+			Id:     value.Id,
+			Name:   value.Name,
+			Email:  value.Email,
+			Team:   UserTeam(value.Team),
+			Role:   UserRole(value.Role),
+			Status: UserStatus(value.Status),
+		})
+	}
+	return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("success read data user", userResponse))
+}

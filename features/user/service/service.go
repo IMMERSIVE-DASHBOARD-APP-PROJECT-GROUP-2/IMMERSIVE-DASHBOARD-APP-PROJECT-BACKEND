@@ -14,6 +14,12 @@ type userService struct {
 	validate *validator.Validate
 }
 
+// GetAllUser implements user.UserServiceInterface.
+func (repo *userService) GetAllUser() ([]user.Core, error) {
+	data, err := repo.userData.GetAllUser()
+	return data, err
+}
+
 // Create implements user.UserServiceInterface.
 // func (*userService) Create(user *user.Core) error {
 // 	panic("unimplemented")

@@ -21,5 +21,6 @@ func InitRoute(e *echo.Echo, db *gorm.DB) {
 	// User Routes
 
 	e.POST("/login", userHandlerAPI.Login)
+	e.GET("/users", userHandlerAPI.GetAllUser)
 
 }
