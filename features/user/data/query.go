@@ -42,7 +42,8 @@ func (repo *userQuery) Insert(user *user.Core) error {
 // GetAllUser implements user.UserDataInterface.
 func (repo *userQuery) GetAllUser() ([]user.Core, error) {
 	var userData []User
-	tx := repo.db.Find(&userData) // select * from users
+	// Mencari data user di database
+	tx := repo.db.Find(&userData)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
@@ -72,6 +73,7 @@ func (repo *userQuery) GetAllUser() ([]user.Core, error) {
 // Login implements user.UserDataInterface.
 func (repo *userQuery) Login(email string, password string) (user.Core, string, error) {
 	var userData User
+	// Mencocokkan data inputan email dengan email di database
 	tx := repo.db.Where("email = ?", email).First(&userData)
 	if tx.Error != nil {
 		return user.Core{}, "", tx.Error
@@ -79,17 +81,16 @@ func (repo *userQuery) Login(email string, password string) (user.Core, string, 
 	if tx.RowsAffected == 0 {
 		return user.Core{}, "", errors.New("login failed, email salah")
 	}
-	fmt.Println(email)
-	fmt.Println(password)
-	fmt.Println(userData.Password)
+	// Mencocokkan data inputan password dengan password yang telah di hashing di database
 	checkPassword := helper.CheckPasswordHash(userData.Password, password)
 	if !checkPassword {
 		return user.Core{}, "", errors.New("login failed, password salah")
 	}
-	fmt.Println(checkPassword)
+	// Memastikan status pengguna Active
 	if userData.Status == NonActive {
-		return user.Core{}, "", errors.New("hanya user dengan status aktif yang dapat melakukan login")
+		return user.Core{}, "", errors.New("Hanya user dengan status aktif yang dapat melakukan login")
 	}
+
 	token, errToken := middlewares.CreateToken(int(userData.ID))
 	if errToken != nil {
 		return user.Core{}, "", errToken

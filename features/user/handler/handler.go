@@ -53,26 +53,28 @@ func (handler *UserHandler) CreateUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, helper.SuccessResponse("success insert data"))
 }
 func (handler *UserHandler) Login(c echo.Context) error {
+	// Memeriksa apakah email dan password inputan dapat di bind
 	loginInput := AuthRequest{}
 	errBind := c.Bind(&loginInput)
 	if errBind != nil {
 		return c.JSON(http.StatusBadRequest, helper.FailedResponse("error bind data"))
 	}
-
+	// Memeriksa apakah email & password telah diinputkan di database
 	userData, token, err := handler.userService.Login(loginInput.Email, loginInput.Password)
 	if err != nil {
 		if strings.Contains(err.Error(), "login failed") {
 			return c.JSON(http.StatusBadRequest, helper.FailedResponse(err.Error()))
+			// Memeriksa validasi di database dan validasi lainnya
 		} else {
-			return c.JSON(http.StatusInternalServerError, helper.FailedResponse("error login,"+err.Error()))
+			return c.JSON(http.StatusInternalServerError, helper.FailedResponse(err.Error()))
 		}
 	}
 
 	return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("login success", map[string]any{
-		"token": token,
-		"email": userData.Email,
-		"id":    userData.Id,
-		"role":  userData.Role,
+		"user_id": userData.Id,
+		"email":   userData.Email,
+		"role":    userData.Role,
+		"token":   token,
 	}))
 }
 
