@@ -21,7 +21,7 @@ func (repo *userQuery) Insert(user *user.Core) error {
 
 	// Create a new database model from the user core data
 	userData := ModelToCore(user)
-
+	fmt.Println(user.Password)
 	// Hash password sebelum disimpan
 	hashedPassword, err := helper.HashPassword(user.Password)
 	if err != nil {
@@ -49,14 +49,17 @@ func (repo *userQuery) Login(email string, password string) (user.Core, string, 
 	if tx.RowsAffected == 0 {
 		return user.Core{}, "", errors.New("login failed, email salah")
 	}
-	checkPassword := helper.CheckPasswordHash(password, userData.Password)
+	fmt.Println(email)
+	fmt.Println(password)
+	fmt.Println(userData.Password)
+	checkPassword := helper.CheckPasswordHash(userData.Password, password)
 	if !checkPassword {
 		return user.Core{}, "", errors.New("login failed, password salah")
 	}
+	fmt.Println(checkPassword)
 	if userData.Status == NonActive {
 		return user.Core{}, "", errors.New("hanya user dengan status aktif yang dapat melakukan login")
 	}
-
 	token, errToken := middlewares.CreateToken(int(userData.ID))
 	if errToken != nil {
 		return user.Core{}, "", errToken

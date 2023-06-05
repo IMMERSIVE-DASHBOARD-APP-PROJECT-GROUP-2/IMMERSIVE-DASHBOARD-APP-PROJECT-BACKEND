@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -39,7 +40,7 @@ func (handler *UserHandler) CreateUser(c echo.Context) error {
 		Role:     user.UserRole(userInput.Role),
 		Status:   user.UserStatus(userInput.Status), Team: user.UserTeam(userInput.Team),
 	}
-
+	fmt.Println("handler", userCore.Password)
 	err := handler.userService.Create(userCore)
 	if err != nil {
 		if strings.Contains(err.Error(), "validation") {

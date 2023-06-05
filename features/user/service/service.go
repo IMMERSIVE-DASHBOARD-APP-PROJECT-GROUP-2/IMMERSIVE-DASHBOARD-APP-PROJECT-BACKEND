@@ -23,16 +23,16 @@ func (service *userService) Create(user *user.Core) error {
 	}
 
 	// Hash password sebelum disimpan
-	hashedPassword, err := helper.HashPassword(user.Password)
-	if err != nil {
-		return err
-	}
+	// hashedPassword, err := helper.HashPassword(user.Password)
+	// if err != nil {
+	// 	return err
+	// }
 
 	// Mengganti password dengan hashed password
-	user.Password = hashedPassword
+	// user.Password = hashedPassword
 
 	// Insert the user data into the database
-	err = service.userData.Insert(user)
+	err := service.userData.Insert(user)
 	if err != nil {
 		return err
 	}
