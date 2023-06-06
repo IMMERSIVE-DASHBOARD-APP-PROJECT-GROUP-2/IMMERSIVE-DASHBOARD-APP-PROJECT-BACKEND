@@ -75,6 +75,7 @@ func (repo *userQuery) GetAllUser() ([]user.Core, error) {
 // Login implements user.UserDataInterface.
 func (repo *userQuery) Login(email string, password string) (user.Core, string, error) {
 	var userData User
+
 	// Mencocokkan data inputan email dengan email di database
 	tx := repo.db.Where("email = ?", email).First(&userData)
 	if tx.Error != nil {
