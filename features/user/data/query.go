@@ -14,6 +14,24 @@ type userQuery struct {
 	db *gorm.DB
 }
 
+// Update implements user.UserDataInterface.
+
+func (repo *userQuery) Update(userID int, updatedUser user.Core) error {
+	userData := ModelToCore(&updatedUser)
+	userData.ID = uint(userID)
+
+	tx := repo.db.Model(&User{}).Where("id = ?", userID).Updates(userData)
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	if tx.RowsAffected == 0 {
+		return errors.New("Gagal memperbarui data, tidak ada baris yang terpengaruh")
+	}
+
+	return nil
+}
+
 // GetRoleByID implements user.UserDataInterface.
 func (repo *userQuery) GetRoleByID(userID int) (user.UserRole, error) {
 	var u User
@@ -27,7 +45,6 @@ func (repo *userQuery) GetRoleByID(userID int) (user.UserRole, error) {
 
 // Insert implements user.UserDataInterface.
 func (repo *userQuery) Insert(user user.Core) error {
-
 	// Konversi data pengguna dari Core ke Model
 	userModel := ModelToCore(&user)
 

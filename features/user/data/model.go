@@ -39,6 +39,7 @@ type User struct {
 	Classes  []classGorm.Class // Relasi One-to-Many dengan model Class
 }
 
+// mapping dari core ke gorm
 func ModelToCore(dataCore *user.Core) *User {
 	return &User{
 		Name:     dataCore.Name,
@@ -51,12 +52,14 @@ func ModelToCore(dataCore *user.Core) *User {
 	}
 }
 
-// mapping dari core ke gorm
-func CoreToModel(dataCore user.Core) User {
-	return User{
-		Name:     dataCore.Name,
-		Phone:    dataCore.Phone,
-		Email:    dataCore.Email,
-		Password: dataCore.Password,
+func CoreToModel(dataUser User) user.Core {
+	return user.Core{
+		Name:     dataUser.Name,
+		Phone:    dataUser.Phone,
+		Email:    dataUser.Email,
+		Password: dataUser.Password,
+		Status:   user.UserStatus(dataUser.Status),
+		Team:     user.UserTeam(dataUser.Team),
+		Role:     user.UserRole(dataUser.Role),
 	}
 }

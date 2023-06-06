@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/DASHBOARDAPP/app/middlewares"
@@ -103,4 +104,43 @@ func (handler *UserHandler) CreateUser(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, helper.SuccessResponse("sukses insert data"))
+}
+
+func (handler *UserHandler) UpdateUser(c echo.Context) error {
+	// Get the ID of the user to be updated
+	userID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponse("ID pengguna tidak valid"))
+	}
+
+	// Get the updated user data from the request
+	userInput := UserRequest{}
+	err = c.Bind(&userInput)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponse("Gagal mengambil data pengguna"))
+	}
+	// Mendapatkan ID pengguna yang login
+	loggedInUserID, err := middlewares.ExtractTokenUserId(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, helper.FailedResponse("gagal mendapatkan ID pengguna"))
+	}
+
+	// Membuat objek user.Core dari userInput
+	updatedUser := user.Core{
+		Name:     userInput.Name,
+		Phone:    userInput.Phone,
+		Email:    userInput.Email,
+		Password: userInput.Password,
+		Role:     user.UserRole(userInput.Role),
+		Status:   user.UserStatus(userInput.Status),
+		Team:     user.UserTeam(userInput.Team),
+	}
+
+	// Memperbarui pengguna
+	err = handler.userService.Update(userID, updatedUser, loggedInUserID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, helper.FailedResponse("Gagal memperbarui pengguna"))
+	}
+
+	return c.JSON(http.StatusOK, helper.SuccessResponse("Berhasil memperbarui pengguna"))
 }

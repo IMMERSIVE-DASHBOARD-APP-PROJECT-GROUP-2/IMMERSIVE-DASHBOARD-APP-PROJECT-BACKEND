@@ -23,6 +23,7 @@ func InitRoute(e *echo.Echo, db *gorm.DB) {
 	e.POST("/login", userHandlerAPI.Login)
 	e.GET("/users", userHandlerAPI.GetAllUser, middlewares.JWTMiddleware())
 
-	e.POST("/users/admin", userHandlerAPI.CreateUser, jwtMiddleware)
+	e.POST("/users/role", userHandlerAPI.CreateUser, jwtMiddleware)
+	e.PUT("/users/role/:id", userHandlerAPI.UpdateUser, jwtMiddleware)
 
 }

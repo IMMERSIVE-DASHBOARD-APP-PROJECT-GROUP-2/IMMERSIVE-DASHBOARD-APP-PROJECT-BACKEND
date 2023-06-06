@@ -7,12 +7,60 @@ import (
 	"github.com/DASHBOARDAPP/features/user/handler"
 	"github.com/DASHBOARDAPP/helper"
 	"github.com/go-playground/validator/v10"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type userService struct {
 	userData user.UserDataInterface
 	validate *validator.Validate
 }
+
+func (service *userService) Update(userID int, updatedUser user.Core, loggedInUserID int) error {
+	role, err := service.userData.GetRoleByID(loggedInUserID)
+	if err != nil {
+		return errors.New("Gagal mendapatkan peran pengguna yang sedang login")
+	}
+
+	if role != user.Admin {
+		return errors.New("Hanya admin yang dapat memperbarui pengguna")
+	}
+
+	if updatedUser.Password != "" {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(updatedUser.Password), bcrypt.DefaultCost)
+		if err != nil {
+			return errors.New("Gagal menghash password")
+		}
+		updatedUser.Password = string(hashedPassword)
+	}
+
+	// Update the user in the repository
+	err = service.userData.Update(userID, updatedUser)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Update implements user.UserServiceInterface.
+// func (service *userService) Update(userID int, updatedUser user.Core) error {
+// 	role, err := service.userData.GetRoleByID(userID)
+// 	if err != nil {
+// 		return errors.New("Gagal mendapatkan peran pengguna yang sedang login")
+// 	}
+
+// 	if role != "admin" {
+// 		return errors.New("Hanya admin yang dapat memperbarui pengguna")
+// 	}
+
+// 	// Memperbarui pengguna di repository
+// 	err = service.userData.Update(userID, updatedUser)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	return nil
+// }
 
 func (service *userService) GetRoleByID(userID int) (user.UserRole, error) {
 	role, err := service.userData.GetRoleByID(userID)
