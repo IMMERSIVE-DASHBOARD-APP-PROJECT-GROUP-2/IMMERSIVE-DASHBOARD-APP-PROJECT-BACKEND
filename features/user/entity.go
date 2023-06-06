@@ -25,16 +25,28 @@ const (
 
 type Core struct {
 	Id        uint
-	Name      string `json:"name" form:"name" validate:"required"`
-	Phone     string `json:"phone" form:"phone" validate:"required"`
-	Email     string `json:"email" form:"email" validate:"required,email"`
-	Password  string `json:"password" form:"password" validate:"required"`
+	Name      string `json:"name" form:"name"`
+	Phone     string `json:"phone" form:"phone"`
+	Email     string `json:"email" form:"email"`
+	Password  string `json:"password" form:"password"`
 	Status    UserStatus
 	Team      UserTeam
 	Role      UserRole
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt time.Time
+}
+
+type LoginInput struct {
+	Email    string `json:"name" validate:"required"`
+	Password string `json:"password" validate:"required"`
+}
+
+type UpdatedInput struct {
+	Name     string `json:"name" form:"name"`
+	Phone    string `json:"phone" form:"phone"`
+	Email    string `json:"email" form:"email"`
+	Password string `json:"password" form:"password"`
 }
 
 type UserDataInterface interface {

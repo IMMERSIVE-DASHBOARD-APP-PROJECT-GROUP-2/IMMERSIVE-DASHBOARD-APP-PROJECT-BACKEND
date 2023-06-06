@@ -13,3 +13,5 @@ func NewUserRole(role string) user.UserRole {
 func NewUserTeam(team string) user.UserTeam {
 	return user.UserTeam(team)
 }
+
+
