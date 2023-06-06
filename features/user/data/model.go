@@ -50,3 +50,13 @@ func ModelToCore(dataCore *user.Core) *User {
 		Role:     UserRole(dataCore.Role),
 	}
 }
+
+// mapping dari core ke gorm
+func CoreToModel(dataCore user.Core) User {
+	return User{
+		Name:     dataCore.Name,
+		Phone:    dataCore.Phone,
+		Email:    dataCore.Email,
+		Password: dataCore.Password,
+	}
+}

@@ -25,10 +25,10 @@ const (
 
 type Core struct {
 	Id        uint
-	Name      string `json:"name" form:"name"`
-	Phone     string `json:"phone" form:"phone"`
-	Email     string `json:"email" form:"email"`
-	Password  string `json:"password" form:"password"`
+	Name      string `json:"name" form:"name" validate:"required"`
+	Phone     string `json:"phone" form:"phone" validate:"required"`
+	Email     string `json:"email" form:"email" validate:"required,email"`
+	Password  string `json:"password" form:"password" validate:"required"`
 	Status    UserStatus
 	Team      UserTeam
 	Role      UserRole
@@ -41,10 +41,12 @@ type UserDataInterface interface {
 	Insert(user *Core) error
 	Login(email, password string) (Core, string, error)
 	GetAllUser() ([]Core, error)
+	UpdateUserById(id string, userInput Core) error
 }
 
 type UserServiceInterface interface {
 	Create(user *Core) error
 	Login(email, password string) (Core, string, error)
 	GetAllUser() ([]Core, error)
+	UpdateUserById(id string, userInput Core) error
 }
