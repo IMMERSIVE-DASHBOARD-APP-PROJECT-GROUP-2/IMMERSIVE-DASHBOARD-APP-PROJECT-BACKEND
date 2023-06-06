@@ -166,3 +166,32 @@ func (handler *UserHandler) DeleteUser(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, helper.SuccessResponse("Pengguna berhasil dihapus"))
 }
+
+func (handler *UserHandler) UpdateUserById(c echo.Context) error {
+	// Mendapatkan nilai ID dari parameter di URL
+	id := c.Param("id")
+
+	// Bind data pengguna yang baru dari request body
+	userInput := UserRequest{}
+	// bind, membaca data yg dikirimkan client via request body
+	errBind := c.Bind(&userInput)
+	if errBind != nil {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponse("error bind data user"))
+	}
+	// mapping dari request ke core
+	userCore := user.Core{
+		Name:     userInput.Name,
+		Phone:    userInput.Phone,
+		Email:    userInput.Email,
+		Password: userInput.Password,
+	}
+	err := handler.userService.UpdateUserById(id, userCore)
+	if err != nil {
+		if strings.Contains(err.Error(), "failed updated data user") {
+			return c.JSON(http.StatusBadRequest, helper.FailedResponse("error updated data user, row affected = 0"))
+		} else {
+			return c.JSON(http.StatusInternalServerError, helper.FailedResponse(err.Error()))
+		}
+	}
+	return c.JSON(http.StatusOK, helper.SuccessResponse("success updated data user"))
+}

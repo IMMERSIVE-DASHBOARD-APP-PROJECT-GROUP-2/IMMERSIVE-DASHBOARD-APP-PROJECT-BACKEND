@@ -37,6 +37,18 @@ type Core struct {
 	DeletedAt time.Time
 }
 
+type LoginInput struct {
+	Email    string `json:"name" validate:"required"`
+	Password string `json:"password" validate:"required"`
+}
+
+type UpdatedInput struct {
+	Name     string `json:"name" form:"name"`
+	Phone    string `json:"phone" form:"phone"`
+	Email    string `json:"email" form:"email"`
+	Password string `json:"password" form:"password"`
+}
+
 type UserDataInterface interface {
 	Insert(user Core) error
 	Login(email, password string) (Core, string, error)
@@ -44,6 +56,7 @@ type UserDataInterface interface {
 	GetRoleByID(userID int) (UserRole, error)
 	Update(userID int, updatedUser Core) error
 	Delete(userID int) error
+	UpdateUserById(id string, userInput Core) error
 }
 
 type UserServiceInterface interface {
@@ -53,4 +66,5 @@ type UserServiceInterface interface {
 	GetAllUser() ([]Core, error)
 	Update(userID int, updatedUser Core, loggedInUserID int) error
 	Delete(userID int, loggedInUserID int) error
+	UpdateUserById(id string, userInput Core) error
 }
