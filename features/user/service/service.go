@@ -15,6 +15,27 @@ type userService struct {
 	validate *validator.Validate
 }
 
+// Delete implements user.UserServiceInterface.
+func (service *userService) Delete(userID int, loggedInUserID int) error {
+	// Periksa peran pengguna yang sedang login
+	role, err := service.userData.GetRoleByID(loggedInUserID)
+	if err != nil {
+		return errors.New("Gagal mendapatkan peran pengguna yang sedang login")
+	}
+
+	// Hanya izinkan pengguna dengan peran "admin" untuk menghapus pengguna
+	if role != user.Admin {
+		return errors.New("Hanya admin yang dapat menghapus pengguna")
+	}
+	// Panggil metode Delete di repo
+	err = service.userData.Delete(userID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (service *userService) Update(userID int, updatedUser user.Core, loggedInUserID int) error {
 	role, err := service.userData.GetRoleByID(loggedInUserID)
 	if err != nil {
@@ -41,26 +62,6 @@ func (service *userService) Update(userID int, updatedUser user.Core, loggedInUs
 
 	return nil
 }
-
-// Update implements user.UserServiceInterface.
-// func (service *userService) Update(userID int, updatedUser user.Core) error {
-// 	role, err := service.userData.GetRoleByID(userID)
-// 	if err != nil {
-// 		return errors.New("Gagal mendapatkan peran pengguna yang sedang login")
-// 	}
-
-// 	if role != "admin" {
-// 		return errors.New("Hanya admin yang dapat memperbarui pengguna")
-// 	}
-
-// 	// Memperbarui pengguna di repository
-// 	err = service.userData.Update(userID, updatedUser)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	return nil
-// }
 
 func (service *userService) GetRoleByID(userID int) (user.UserRole, error) {
 	role, err := service.userData.GetRoleByID(userID)

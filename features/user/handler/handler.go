@@ -144,3 +144,25 @@ func (handler *UserHandler) UpdateUser(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, helper.SuccessResponse("Berhasil memperbarui pengguna"))
 }
+
+func (handler *UserHandler) DeleteUser(c echo.Context) error {
+	// Mendapatkan ID pengguna yang akan dihapus
+	userID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponse("ID pengguna tidak valid"))
+	}
+
+	// Mendapatkan ID pengguna yang login
+	loggedInUserID, err := middlewares.ExtractTokenUserId(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, helper.FailedResponse("Gagal mendapatkan ID pengguna"))
+	}
+
+	// Memanggil service untuk menghapus pengguna
+	err = handler.userService.Delete(userID, loggedInUserID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, helper.FailedResponse("Gagal menghapus pengguna"))
+	}
+
+	return c.JSON(http.StatusOK, helper.SuccessResponse("Pengguna berhasil dihapus"))
+}

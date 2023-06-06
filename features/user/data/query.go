@@ -14,8 +14,30 @@ type userQuery struct {
 	db *gorm.DB
 }
 
-// Update implements user.UserDataInterface.
+// Delete implements user.UserDataInterface.
+func (repo *userQuery) Delete(userID int) error {
+	var user User
 
+	if err := repo.db.First(&user, userID).Error; err != nil {
+		return err
+	}
+
+	// Ubah status pengguna menjadi "non_active"
+	user.Status = NonActive
+	// Simpan perubahan status pengguna
+	if err := repo.db.Save(&user).Error; err != nil {
+		return err
+	}
+
+	// Hapus pengguna dari basis data
+	if err := repo.db.Delete(&user).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Update implements user.UserDataInterface.
 func (repo *userQuery) Update(userID int, updatedUser user.Core) error {
 	userData := ModelToCore(&updatedUser)
 	userData.ID = uint(userID)

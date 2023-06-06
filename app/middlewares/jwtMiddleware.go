@@ -45,16 +45,6 @@ func ExtractTokenUserId(c echo.Context) (int, error) {
 	return userID, nil
 }
 
-// func ExtractTokenUserId(e echo.Context) int {
-// 	user := e.Get("user").(*jwt.Token)
-// 	if user != nil {
-// 		claims := user.Claims.(jwt.MapClaims)
-// 		userId := int(claims["userId"].(float64))
-// 		return userId
-// 	}
-// 	return 0
-// }
-
 func VerifyToken(tokenString string) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {

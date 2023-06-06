@@ -25,5 +25,6 @@ func InitRoute(e *echo.Echo, db *gorm.DB) {
 
 	e.POST("/users/role", userHandlerAPI.CreateUser, jwtMiddleware)
 	e.PUT("/users/role/:id", userHandlerAPI.UpdateUser, jwtMiddleware)
+	e.DELETE("/users/role/:id", userHandlerAPI.DeleteUser, jwtMiddleware)
 
 }
