@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"regexp"
 	"unicode"
 
@@ -16,13 +15,36 @@ type userService struct {
 	validate *validator.Validate
 }
 
-func (service *userService) Create(user *user.Core) error {
-	// Lakukan validasi jika hanya admin atau manager yang dapat menambahkan pengguna
-	if user.Role != helper.NewUserRole("admin") && user.Team != helper.NewUserTeam("manager") {
-		return fmt.Errorf("only admin and manager can add users")
+func (service *userService) GetRoleByID(userID int) (user.UserRole, error) {
+	role, err := service.userData.GetRoleByID(userID)
+	if err != nil {
+		return "", err
 	}
-	// Insert the user data into the database
-	err := service.userData.Insert(user)
+
+	return user.UserRole(role), nil
+}
+
+func (service *userService) Create(user user.Core, loggedInUserID int) error {
+	role, err := service.userData.GetRoleByID(loggedInUserID)
+	if err != nil {
+		return errors.New("Gagal mendapatkan role pengguna yang masuk")
+	}
+
+	if role != "admin" {
+		return errors.New("Hanya admin yang dapat membuat pengguna")
+	}
+
+	// Generate hashed password
+	hashedPassword, err := helper.HashPassword(user.Password)
+	if err != nil {
+		return err
+	}
+
+	// Set hashed password to user
+	user.Password = hashedPassword
+
+	// Call repository to insert user
+	err = service.userData.Insert(user)
 	if err != nil {
 		return err
 	}

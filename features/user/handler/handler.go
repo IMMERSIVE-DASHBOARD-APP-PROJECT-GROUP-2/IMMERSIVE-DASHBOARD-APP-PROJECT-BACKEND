@@ -1,10 +1,10 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
+	"github.com/DASHBOARDAPP/app/middlewares"
 	"github.com/DASHBOARDAPP/features/user"
 	"github.com/DASHBOARDAPP/helper"
 	"github.com/labstack/echo/v4"
@@ -19,39 +19,7 @@ func New(service user.UserServiceInterface) *UserHandler {
 		userService: service,
 	}
 }
-func (handler *UserHandler) CreateUser(c echo.Context) error {
-	userInput := UserRequest{}
 
-	errBind := c.Bind(&userInput)
-	if errBind != nil {
-		return c.JSON(http.StatusBadRequest, helper.FailedResponse("error bind data"))
-	}
-
-	// Pengecekan peran pengguna
-	if userInput.Role != "admin" && userInput.Role != "manager" {
-		return c.JSON(http.StatusForbidden, helper.FailedResponse("Only admin and manager can add users"))
-	}
-
-	userCore := &user.Core{
-		Name:     userInput.Name,
-		Phone:    userInput.Phone,
-		Email:    userInput.Email,
-		Password: userInput.Password,
-		Role:     user.UserRole(userInput.Role),
-		Status:   user.UserStatus(userInput.Status), Team: user.UserTeam(userInput.Team),
-	}
-	fmt.Println("handler", userCore.Password)
-	err := handler.userService.Create(userCore)
-	if err != nil {
-		if strings.Contains(err.Error(), "validation") {
-			return c.JSON(http.StatusBadRequest, helper.FailedResponse(err.Error()))
-		} else {
-			return c.JSON(http.StatusInternalServerError, helper.FailedResponse("error insert data"+err.Error()))
-		}
-	}
-
-	return c.JSON(http.StatusOK, helper.SuccessResponse("success insert data"))
-}
 func (handler *UserHandler) Login(c echo.Context) error {
 	// Memeriksa apakah email dan password inputan dapat di bind
 	loginInput := AuthRequest{}
@@ -97,4 +65,42 @@ func (handler *UserHandler) GetAllUser(c echo.Context) error {
 		})
 	}
 	return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("success read data user", userResponse))
+}
+
+func (handler *UserHandler) CreateUser(c echo.Context) error {
+	// Mendapatkan data pengguna dari permintaan
+	userInput := UserRequest{}
+	err := c.Bind(&userInput)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponse("error bind data"))
+	}
+
+	// Mendapatkan ID pengguna yang login
+	loggedInUserID, err := middlewares.ExtractTokenUserId(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, helper.FailedResponse("gagal mendapatkan ID pengguna"))
+	}
+
+	// Membuat data pengguna
+	user := user.Core{
+		Name:     userInput.Name,
+		Phone:    userInput.Phone,
+		Email:    userInput.Email,
+		Password: userInput.Password,
+		Role:     user.UserRole(userInput.Role),
+		Status:   user.UserStatus(userInput.Status),
+		Team:     user.UserTeam(userInput.Team),
+	}
+
+	// Memanggil service untuk menambahkan pengguna
+	err = handler.userService.Create(user, loggedInUserID)
+	if err != nil {
+		if strings.Contains(err.Error(), "validation") {
+			return c.JSON(http.StatusBadRequest, helper.FailedResponse(err.Error()))
+		} else {
+			return c.JSON(http.StatusInternalServerError, helper.FailedResponse("gagal insert data"+err.Error()))
+		}
+	}
+
+	return c.JSON(http.StatusOK, helper.SuccessResponse("sukses insert data"))
 }

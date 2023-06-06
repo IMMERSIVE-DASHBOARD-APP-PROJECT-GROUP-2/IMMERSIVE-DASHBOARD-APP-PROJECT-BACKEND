@@ -16,13 +16,13 @@ func InitRoute(e *echo.Echo, db *gorm.DB) {
 
 	userHandlerAPI := _userHandler.New(userService)
 
-	// Register middleware
-	// jwtMiddleware := middlewares.JWTMiddleware()
+	// // Register middleware
+	jwtMiddleware := middlewares.JWTMiddleware()
 
-	// User Routes
-
-	e.POST("/users", userHandlerAPI.CreateUser)
+	// // User Routes
 	e.POST("/login", userHandlerAPI.Login)
 	e.GET("/users", userHandlerAPI.GetAllUser, middlewares.JWTMiddleware())
+
+	e.POST("/users/admin", userHandlerAPI.CreateUser, jwtMiddleware)
 
 }
