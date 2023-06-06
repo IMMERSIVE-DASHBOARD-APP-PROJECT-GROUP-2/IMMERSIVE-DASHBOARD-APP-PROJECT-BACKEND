@@ -19,7 +19,7 @@ type userService struct {
 
 // UpdateUserById implements user.UserServiceInterface.
 func (service *userService) UpdateUserById(id string, userInput user.Core) error {
-	// Mengatur validator
+	// Mengatur ulang validator
 	validate := validator.New()
 	updatedInput := user.UpdatedInput{
 		Name:     userInput.Name,
@@ -33,6 +33,11 @@ func (service *userService) UpdateUserById(id string, userInput user.Core) error
 		return errValidate
 	}
 
+	// Cek apakah pengguna mengirimkan data kosong untuk semua bidang
+	if userInput.Name == "" && userInput.Phone == "" && userInput.Email == "" && userInput.Password == "" {
+		return errors.New("error validation: Data tidak boleh kosong")
+	}
+
 	// Validasi email harus format email
 	emailFormat := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
 	if updatedInput.Email != "" && !emailFormat.MatchString(updatedInput.Email) {
@@ -41,7 +46,7 @@ func (service *userService) UpdateUserById(id string, userInput user.Core) error
 
 	// Validasi panjang password minimal 8 karakter
 	if updatedInput.Password != "" && len(updatedInput.Password) < 8 {
-		return errors.New("error validation: password harus memiliki panjang minimal 8 karakter")
+		return errors.New("error validation: Password harus memiliki panjang minimal 8 karakter")
 	}
 
 	// Validasi password kombinasi huruf besar, huruf kecil, dan angka
@@ -59,7 +64,7 @@ func (service *userService) UpdateUserById(id string, userInput user.Core) error
 			}
 		}
 		if !hasUppercase || !hasLowercase || !hasDigit {
-			return errors.New("error validation: password harus kombinasi huruf besar, huruf kecil, dan angka")
+			return errors.New("error validation: Password harus kombinasi huruf besar, huruf kecil, dan angka")
 		}
 	}
 

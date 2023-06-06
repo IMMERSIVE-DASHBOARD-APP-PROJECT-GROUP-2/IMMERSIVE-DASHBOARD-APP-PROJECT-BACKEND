@@ -38,8 +38,8 @@ type Core struct {
 }
 
 type LoginInput struct {
-	Email    string `json:"name" validate:"required"`
-	Password string `json:"password" validate:"required"`
+	Email    string `json:"name" form:"name" validate:"required"`
+	Password string `json:"password" form:"password" validate:"required"`
 }
 
 type UpdatedInput struct {

@@ -53,7 +53,6 @@ func (handler *UserHandler) GetAllUser(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, helper.FailedResponse("error read data user"))
 	}
-
 	var userResponse []UserResponse
 	for _, value := range results {
 		userResponse = append(userResponse, UserResponse{
@@ -178,6 +177,17 @@ func (handler *UserHandler) UpdateUserById(c echo.Context) error {
 	if errBind != nil {
 		return c.JSON(http.StatusBadRequest, helper.FailedResponse("error bind data user"))
 	}
+	// Mendapatkan ID pengguna yang sedang login
+	loggedInUserID, err := middlewares.ExtractTokenUserId(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, helper.FailedResponse("Gagal mendapatkan ID pengguna"))
+	}
+
+	// Jika ID pengguna yang sedang login tidak sama dengan ID pengguna yang ingin diubah
+	if strconv.Itoa(loggedInUserID) != id {
+		return c.JSON(http.StatusInternalServerError, helper.FailedResponse("Anda hanya dapat mengubah profil sendiri"))
+	}
+
 	// mapping dari request ke core
 	userCore := user.Core{
 		Name:     userInput.Name,
@@ -185,7 +195,7 @@ func (handler *UserHandler) UpdateUserById(c echo.Context) error {
 		Email:    userInput.Email,
 		Password: userInput.Password,
 	}
-	err := handler.userService.UpdateUserById(id, userCore)
+	err = handler.userService.UpdateUserById(id, userCore)
 	if err != nil {
 		if strings.Contains(err.Error(), "failed updated data user") {
 			return c.JSON(http.StatusBadRequest, helper.FailedResponse("error updated data user, row affected = 0"))
