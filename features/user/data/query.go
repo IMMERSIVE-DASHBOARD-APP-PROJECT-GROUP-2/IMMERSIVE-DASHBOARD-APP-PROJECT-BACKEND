@@ -14,6 +14,30 @@ type userQuery struct {
 	db *gorm.DB
 }
 
+// UpdateUserById implements user.UserDataInterface.
+func (repo *userQuery) UpdateUserById(id string, userInput user.Core) error {
+	// Mencari pengguna berdasarkan ID
+	var userData User
+	tx := repo.db.First(&userData, id)
+	// Mengupdate data pengguna berdasarkan ID dari userInputGorm
+	px := repo.db.Model(&userData).Updates(CoreToModel(userInput))
+	if tx.Error != nil {
+		return tx.Error
+	} else if px.Error != nil {
+		return px.Error
+	}
+
+	// Menyimpan perubahan data pengguna dari Input ke database
+	tx = repo.db.Save(&userData)
+	if tx.Error != nil {
+		return tx.Error
+	}
+	if tx.RowsAffected == 0 {
+		return errors.New("Updated Failed, row affected = 0")
+	}
+	return nil
+}
+
 func (repo *userQuery) Insert(user *user.Core) error {
 	if user.Role != helper.NewUserRole("admin") && user.Team != helper.NewUserTeam("manager") {
 		return fmt.Errorf("only admin and manager can add users")
@@ -73,6 +97,7 @@ func (repo *userQuery) GetAllUser() ([]user.Core, error) {
 // Login implements user.UserDataInterface.
 func (repo *userQuery) Login(email string, password string) (user.Core, string, error) {
 	var userData User
+
 	// Mencocokkan data inputan email dengan email di database
 	tx := repo.db.Where("email = ?", email).First(&userData)
 	if tx.Error != nil {
