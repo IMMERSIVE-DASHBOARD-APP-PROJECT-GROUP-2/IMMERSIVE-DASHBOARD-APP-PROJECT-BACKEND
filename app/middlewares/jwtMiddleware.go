@@ -2,11 +2,12 @@ package middlewares
 
 import (
 	"errors"
+
 	"time"
 
 	"github.com/DASHBOARDAPP/app/config"
 	"github.com/golang-jwt/jwt/v5"
-	echojwt "github.com/labstack/echo-jwt"
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 )
 
@@ -27,16 +28,32 @@ func CreateToken(userId int) (string, error) {
 
 	return signedToken, nil
 }
-
-func ExtractTokenUserId(e echo.Context) int {
-	user := e.Get("user").(*jwt.Token)
-	if user != nil {
-		claims := user.Claims.(jwt.MapClaims)
-		userId := int(claims["userId"].(float64))
-		return userId
+func ExtractTokenUserId(c echo.Context) (int, error) {
+	user := c.Get("user")
+	if user == nil {
+		return 0, errors.New("failed to extract user ID from token")
 	}
-	return 0
+	token, ok := user.(*jwt.Token)
+	if !ok {
+		return 0, errors.New("failed to extract user ID from token")
+	}
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return 0, errors.New("failed to extract user ID from token")
+	}
+	userID := int(claims["userId"].(float64))
+	return userID, nil
 }
+
+// func ExtractTokenUserId(e echo.Context) int {
+// 	user := e.Get("user").(*jwt.Token)
+// 	if user != nil {
+// 		claims := user.Claims.(jwt.MapClaims)
+// 		userId := int(claims["userId"].(float64))
+// 		return userId
+// 	}
+// 	return 0
+// }
 
 func VerifyToken(tokenString string) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {

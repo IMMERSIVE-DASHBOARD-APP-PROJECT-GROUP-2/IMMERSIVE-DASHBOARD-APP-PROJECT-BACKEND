@@ -2,11 +2,11 @@ package data
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/DASHBOARDAPP/app/middlewares"
 	"github.com/DASHBOARDAPP/features/user"
 	"github.com/DASHBOARDAPP/helper"
+
 	"gorm.io/gorm"
 )
 
@@ -14,25 +14,27 @@ type userQuery struct {
 	db *gorm.DB
 }
 
-func (repo *userQuery) Insert(user *user.Core) error {
-	if user.Role != helper.NewUserRole("admin") && user.Team != helper.NewUserTeam("manager") {
-		return fmt.Errorf("only admin and manager can add users")
-	}
-
-	// Create a new database model from the user core data
-	userData := ModelToCore(user)
-
-	// Hash password sebelum disimpan
-	hashedPassword, err := helper.HashPassword(user.Password)
+// GetRoleByID implements user.UserDataInterface.
+func (repo *userQuery) GetRoleByID(userID int) (user.UserRole, error) {
+	var u User
+	err := repo.db.Where("id = ?", userID).First(&u).Error
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	// Mengganti password dengan hashed password
-	userData.Password = hashedPassword
+	return user.UserRole(u.Role), nil
+}
 
-	// Insert the user data into the database
-	if err := repo.db.Create(&userData).Error; err != nil {
+// Insert implements user.UserDataInterface.
+func (repo *userQuery) Insert(user user.Core) error {
+
+	// Konversi data pengguna dari Core ke Model
+	userModel := ModelToCore(&user)
+
+	// Lakukan operasi penambahan pengguna ke basis data menggunakan GORM
+	err := repo.db.Create(userModel).Error
+	if err != nil {
+		// Error saat menambahkan pengguna ke basis data
 		return err
 	}
 

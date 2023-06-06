@@ -37,11 +37,13 @@ type Core struct {
 }
 
 type UserDataInterface interface {
-	Insert(user *Core) error
+	Insert(user Core) error
 	Login(email, password string) (Core, string, error)
+	GetRoleByID(userID int) (UserRole, error)
 }
 
 type UserServiceInterface interface {
-	Create(user *Core) error
+	GetRoleByID(userID int) (UserRole, error)
+	Create(user Core, loggedInUserID int) error
 	Login(email, password string) (Core, string, error)
 }

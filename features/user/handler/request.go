@@ -6,10 +6,10 @@ type AuthRequest struct {
 }
 type UserRequest struct {
 	Name     string `json:"name"`
-	Phone    string `json:"phone"`
 	Email    string `json:"email"`
+	Phone    string `json:"phone"`
 	Password string `json:"password"`
+	Status   string `json:"status"`
 	Role     string `json:"role"`
-	Team     string `json:"Team"`
-	Status   string `json:"Status"`
+	Team     string `json:"team"`
 }

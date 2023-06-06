@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"github.com/DASHBOARDAPP/app/middlewares"
 	_userData "github.com/DASHBOARDAPP/features/user/data"
 	_userHandler "github.com/DASHBOARDAPP/features/user/handler"
 	_userService "github.com/DASHBOARDAPP/features/user/service"
@@ -15,12 +16,12 @@ func InitRoute(e *echo.Echo, db *gorm.DB) {
 
 	userHandlerAPI := _userHandler.New(userService)
 
-	// Register middleware
-	// jwtMiddleware := middlewares.JWTMiddleware()
+	// // Register middleware
+	jwtMiddleware := middlewares.JWTMiddleware()
 
-	// User Routes
-
-	e.POST("/users", userHandlerAPI.CreateUser)
+	// // User Routes
 	e.POST("/login", userHandlerAPI.Login)
+
+	e.POST("/users/admin", userHandlerAPI.CreateUser, jwtMiddleware)
 
 }
