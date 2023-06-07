@@ -5,6 +5,9 @@ import (
 	_classData "github.com/DASHBOARDAPP/features/class/data"
 	_classHandler "github.com/DASHBOARDAPP/features/class/handler"
 	_classService "github.com/DASHBOARDAPP/features/class/service"
+	_menteeData "github.com/DASHBOARDAPP/features/mentee/data"
+	_menteeHandler "github.com/DASHBOARDAPP/features/mentee/handler"
+	_menteeService "github.com/DASHBOARDAPP/features/mentee/service"
 	_userData "github.com/DASHBOARDAPP/features/user/data"
 	_userHandler "github.com/DASHBOARDAPP/features/user/handler"
 	_userService "github.com/DASHBOARDAPP/features/user/service"
@@ -40,4 +43,14 @@ func InitRoute(e *echo.Echo, db *gorm.DB) {
 	e.POST("/classes", classHandlerAPI.CreateClass, middlewares.JWTMiddleware())
 	e.GET("/classes", classHandlerAPI.GetAllClass, middlewares.JWTMiddleware())
 	e.PUT("/classes/:id", classHandlerAPI.UpdateClassById, middlewares.JWTMiddleware())
+
+	menteeData := _menteeData.New(db)
+
+	menteeService := _menteeService.New(menteeData)
+
+	menteeHandlerAPI := _menteeHandler.New(menteeService)
+
+	//EndPointMentee
+	e.POST("/mentees", menteeHandlerAPI.CreateMentee, middlewares.JWTMiddleware())
+	// e.GET("/classes", classHandlerAPI.GetAllClass, middlewares.JWTMiddleware())
 }
