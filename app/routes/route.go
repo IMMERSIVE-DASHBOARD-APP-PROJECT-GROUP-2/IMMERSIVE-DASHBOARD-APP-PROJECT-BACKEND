@@ -2,6 +2,9 @@ package routes
 
 import (
 	"github.com/DASHBOARDAPP/app/middlewares"
+	_classData "github.com/DASHBOARDAPP/features/class/data"
+	_classHandler "github.com/DASHBOARDAPP/features/class/handler"
+	_classService "github.com/DASHBOARDAPP/features/class/service"
 	_userData "github.com/DASHBOARDAPP/features/user/data"
 	_userHandler "github.com/DASHBOARDAPP/features/user/handler"
 	_userService "github.com/DASHBOARDAPP/features/user/service"
@@ -26,5 +29,14 @@ func InitRoute(e *echo.Echo, db *gorm.DB) {
 	e.POST("/users/role", userHandlerAPI.CreateUser, jwtMiddleware)
 	e.PUT("/users/role/:id", userHandlerAPI.UpdateUser, jwtMiddleware)
 	e.DELETE("/users/role/:id", userHandlerAPI.DeleteUser, jwtMiddleware)
+
+	classData := _classData.New(db)
+
+	classService := _classService.New(classData)
+
+	classHandlerAPI := _classHandler.New(classService)
+
+	//EndPointBook
+	e.POST("/classes", classHandlerAPI.CreateClass, middlewares.JWTMiddleware())
 
 }

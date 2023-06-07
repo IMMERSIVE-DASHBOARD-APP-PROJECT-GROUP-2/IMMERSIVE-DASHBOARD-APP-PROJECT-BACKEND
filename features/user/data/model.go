@@ -36,7 +36,7 @@ type User struct {
 	Team     UserTeam          `gorm:"type:ENUM('manager', 'mentor', 'team_placement', 'team_people_skill')"`
 	Role     UserRole          `gorm:"type:ENUM('admin', 'karyawan')"`
 	Logs     []logGorm.Log     // Relasi One-to-Many dengan model Log
-	Classes  []classGorm.Class // Relasi One-to-Many dengan model Class
+	Classes  []classGorm.Class `gorm:"constraint:OnUpdate:CASCADE"` // Relasi One-to-Many dengan model Class
 }
 
 // mapping dari core ke gorm

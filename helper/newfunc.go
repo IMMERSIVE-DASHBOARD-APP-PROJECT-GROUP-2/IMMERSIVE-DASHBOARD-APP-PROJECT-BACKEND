@@ -2,6 +2,7 @@ package helper
 
 import (
 	"errors"
+	"unicode"
 
 	"github.com/DASHBOARDAPP/app/config"
 	"github.com/DASHBOARDAPP/features/user"
@@ -37,4 +38,24 @@ func validateTokenAndGetRole(token string) (user.UserRole, error) {
 	role := claims["role"].(string)
 
 	return user.UserRole(role), nil
+}
+
+// Fungsi helper untuk memeriksa apakah string hanya terdiri dari angka
+func containsOnlyNumbers(s string) bool {
+	for _, r := range s {
+		if r < '0' || r > '9' {
+			return false
+		}
+	}
+	return true
+}
+
+// Fungsi helper untuk memeriksa apakah string mengandung simbol
+func containsSymbols(s string) bool {
+	for _, r := range s {
+		if unicode.IsSymbol(r) || unicode.IsPunct(r) {
+			return true
+		}
+	}
+	return false
 }
