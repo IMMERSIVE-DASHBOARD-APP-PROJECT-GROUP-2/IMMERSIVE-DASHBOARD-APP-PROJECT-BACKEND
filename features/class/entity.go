@@ -15,9 +15,11 @@ type Core struct {
 type ClassDataInterface interface {
 	CreateClass(classInput Core) error
 	GetAllClass() ([]Core, error)
+	UpdateClassById(id string, classInput Core) error
 }
 
 type ClassServiceInterface interface {
 	CreateClass(classInput Core) error
 	GetAllClass() ([]Core, error)
+	UpdateClassById(id string, classInput Core) error
 }

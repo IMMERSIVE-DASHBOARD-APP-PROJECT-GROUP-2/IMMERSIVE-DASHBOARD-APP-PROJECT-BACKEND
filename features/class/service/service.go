@@ -12,6 +12,20 @@ type classService struct {
 	validate  *validator.Validate
 }
 
+// UpdateClassById implements class.ClassServiceInterface.
+func (service *classService) UpdateClassById(id string, classInput class.Core) error {
+	errValidate := service.validate.Struct(classInput)
+	if errValidate != nil {
+		return errValidate
+	}
+	// Validasi nama tidak boleh kosong
+	if classInput.Name == "" {
+		return errors.New("Nama kelas tidak boleh kosong")
+	}
+	errUpdate := service.classData.UpdateClassById(id, classInput)
+	return errUpdate
+}
+
 // GetAllClass implements class.ClassServiceInterface.
 func (service *classService) GetAllClass() ([]class.Core, error) {
 	data, err := service.classData.GetAllClass()

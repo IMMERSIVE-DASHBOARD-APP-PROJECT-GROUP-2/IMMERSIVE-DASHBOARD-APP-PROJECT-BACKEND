@@ -39,4 +39,5 @@ func InitRoute(e *echo.Echo, db *gorm.DB) {
 	//EndPointBook
 	e.POST("/classes", classHandlerAPI.CreateClass, middlewares.JWTMiddleware())
 	e.GET("/classes", classHandlerAPI.GetAllClass, middlewares.JWTMiddleware())
+	e.PUT("/classes/:id", classHandlerAPI.UpdateClassById, middlewares.JWTMiddleware())
 }

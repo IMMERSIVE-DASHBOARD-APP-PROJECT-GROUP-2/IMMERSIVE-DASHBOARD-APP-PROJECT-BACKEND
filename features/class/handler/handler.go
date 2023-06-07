@@ -68,3 +68,36 @@ func (handler *ClassHandler) GetAllClass(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("success read data class", classResponse))
 }
+
+func (handler *ClassHandler) UpdateClassById(c echo.Context) error {
+	// Mendapatkan nilai ID dari parameter di URL
+	id := c.Param("id")
+	// Mendapatkan ID pengguna yang sedang login
+	loggedInUserID, err := middlewares.ExtractTokenUserId(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, helper.FailedResponse("Gagal mendapatkan ID pengguna"))
+	}
+	// Bind data pengguna yang baru dari request body
+	classInput := ClassRequest{}
+	// bind, membaca data yg dikirimkan client via request body
+	errBind := c.Bind(&classInput)
+	if errBind != nil {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponse("error bind data class"))
+	}
+
+	// mapping input class dan id login ke core
+	classCore := class.Core{
+		Name:   classInput.Name,
+		UserID: uint(loggedInUserID),
+	}
+
+	err = handler.classService.UpdateClassById(id, classCore)
+	if err != nil {
+		if strings.Contains(err.Error(), "failed updated data class") {
+			return c.JSON(http.StatusBadRequest, helper.FailedResponse("error updated data class, row affected = 0"))
+		} else {
+			return c.JSON(http.StatusInternalServerError, helper.FailedResponse(err.Error()))
+		}
+	}
+	return c.JSON(http.StatusOK, helper.SuccessResponse("success updated data Class"))
+}
