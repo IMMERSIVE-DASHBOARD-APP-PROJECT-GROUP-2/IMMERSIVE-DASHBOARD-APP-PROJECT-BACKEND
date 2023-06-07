@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/DASHBOARDAPP/app/middlewares"
@@ -50,4 +51,18 @@ func (handler *ClassHandler) CreateClass(c echo.Context) error {
 		}
 	}
 	return c.JSON(http.StatusOK, helper.SuccessResponse("success inserted data class"))
+}
+
+func (handler *ClassHandler) DeleteClass(c echo.Context) error {
+	classID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponse("ID kelas tidak valid"))
+	}
+
+	err = handler.classService.DeleteClass(uint(classID))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, helper.FailedResponse("Gagal menghapus kelas"))
+	}
+
+	return c.JSON(http.StatusOK, helper.SuccessResponse("Kelas berhasil dihapus"))
 }

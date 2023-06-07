@@ -94,6 +94,7 @@ func (service *userService) Delete(userID int, loggedInUserID int) error {
 }
 
 func (service *userService) Update(userID int, updatedUser user.Core, loggedInUserID int) error {
+	// Retrieve the role of the logged-in user
 	role, err := service.userData.GetRoleByID(loggedInUserID)
 	if err != nil {
 		return errors.New("Gagal mendapatkan peran pengguna yang sedang login")
@@ -103,7 +104,31 @@ func (service *userService) Update(userID int, updatedUser user.Core, loggedInUs
 		return errors.New("Hanya admin yang dapat memperbarui pengguna")
 	}
 
+	// Validate the updated user's password
 	if updatedUser.Password != "" {
+		validate := validator.New()
+		err = validate.Var(updatedUser.Password, "gte=8")
+		if err != nil {
+			return errors.New("error validation: password harus memiliki panjang minimal 8 karakter")
+		}
+
+		hasUppercase := false
+		hasLowercase := false
+		hasDigit := false
+		for _, ch := range updatedUser.Password {
+			if unicode.IsUpper(ch) {
+				hasUppercase = true
+			} else if unicode.IsLower(ch) {
+				hasLowercase = true
+			} else if unicode.IsDigit(ch) {
+				hasDigit = true
+			}
+		}
+		if !hasUppercase || !hasLowercase || !hasDigit {
+			return errors.New("error validation: password harus kombinasi huruf besar, huruf kecil, dan angka")
+		}
+
+		// Hash the updated password
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(updatedUser.Password), bcrypt.DefaultCost)
 		if err != nil {
 			return errors.New("Gagal menghash password")
@@ -130,6 +155,7 @@ func (service *userService) GetRoleByID(userID int) (user.UserRole, error) {
 }
 
 func (service *userService) Create(user user.Core, loggedInUserID int) error {
+	// Retrieve the role of the logged-in user
 	role, err := service.userData.GetRoleByID(loggedInUserID)
 	if err != nil {
 		return errors.New("Gagal mendapatkan role pengguna yang masuk")
@@ -137,6 +163,36 @@ func (service *userService) Create(user user.Core, loggedInUserID int) error {
 
 	if role != "admin" {
 		return errors.New("Hanya admin yang dapat membuat pengguna")
+	}
+
+	// Validate email format
+	validate := validator.New()
+	err = validate.Var(user.Email, "email")
+	if err != nil {
+		return errors.New("error validation: Format email tidak valid")
+	}
+
+	// Validate minimum password length of 8 characters
+	err = validate.Var(user.Password, "gte=8")
+	if err != nil {
+		return errors.New("error validation: password harus memiliki panjang minimal 8 karakter")
+	}
+
+	// Validate password combination of uppercase, lowercase, and digit
+	hasUppercase := false
+	hasLowercase := false
+	hasDigit := false
+	for _, ch := range user.Password {
+		if unicode.IsUpper(ch) {
+			hasUppercase = true
+		} else if unicode.IsLower(ch) {
+			hasLowercase = true
+		} else if unicode.IsDigit(ch) {
+			hasDigit = true
+		}
+	}
+	if !hasUppercase || !hasLowercase || !hasDigit {
+		return errors.New("error validation: password harus kombinasi huruf besar, huruf kecil, dan angka")
 	}
 
 	// Generate hashed password

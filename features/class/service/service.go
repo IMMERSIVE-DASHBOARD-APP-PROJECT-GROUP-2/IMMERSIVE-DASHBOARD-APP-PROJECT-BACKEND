@@ -12,6 +12,15 @@ type classService struct {
 	validate  *validator.Validate
 }
 
+// DeleteClass implements class.ClassServiceInterface.
+func (service *classService) DeleteClass(classID uint) error {
+	err := service.classData.DeleteClass(classID)
+	if err != nil {
+		return errors.New("Gagal menghapus kelas")
+	}
+	return nil
+}
+
 // CreateClass implements class.ClassServiceInterface.
 func (service *classService) CreateClass(classInput class.Core) error {
 	errValidate := service.validate.Struct(classInput)

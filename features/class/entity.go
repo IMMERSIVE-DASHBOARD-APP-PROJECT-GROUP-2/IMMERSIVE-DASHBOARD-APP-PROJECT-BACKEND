@@ -14,8 +14,10 @@ type Core struct {
 
 type ClassDataInterface interface {
 	CreateClass(classInput Core) error
+	DeleteClass(classID uint) error
 }
 
 type ClassServiceInterface interface {
 	CreateClass(classInput Core) error
+	DeleteClass(classID uint) error
 }

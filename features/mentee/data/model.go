@@ -7,7 +7,19 @@ import (
 
 type MenteeCategory string
 type MenteeStatus string
+type MenteeGender string
+type MenteeEmergency string
 
+const (
+	OrangTua MenteeEmergency = "orang_tua"
+	Saudara  MenteeEmergency = "Saudara_kandung"
+	Kakek    MenteeEmergency = "kakek"
+	Nenek    MenteeEmergency = "nenek"
+)
+const (
+	Male   MenteeGender = "male"
+	Female MenteeGender = "female"
+)
 const (
 	IT    MenteeCategory = "it"
 	NonIT MenteeCategory = "non_it"
@@ -28,11 +40,19 @@ const (
 
 type Mentee struct {
 	gorm.Model
-	Name     string
-	Address  string
-	Phone    string
-	Category MenteeCategory `gorm:"type:ENUM('it','non_it')"`
-	Status   MenteeStatus   `gorm:"type:ENUM('interview', 'join_class', 'unit1', 'unit2', 'unit3', 'repeat_unit1', 'repeat_unit2', 'repeat_unit3', 'placement', 'eliminated', 'graduate')"`
-	ClassID  uint
-	Logs     []logGorm.Log // Relasi One-to-Many dengan model Class
+	Name            string
+	Address         string
+	HomeAddress     string
+	Email           string
+	Gender          MenteeGender `gorm:"type:ENUM('male','female')"`
+	Telegram        string
+	Phone           string
+	EmergencyName   string
+	EmergencyStatus MenteeEmergency `gorm:"type:ENUM('orang_tua','saudara_kandung','kakek','nenek')"`
+	Category        MenteeCategory  `gorm:"type:ENUM('it','non_it')"`
+	Status          MenteeStatus    `gorm:"type:ENUM('interview', 'join_class', 'unit1', 'unit2', 'unit3', 'repeat_unit1', 'repeat_unit2', 'repeat_unit3', 'placement', 'eliminated', 'graduate')"`
+	Major           string
+	Graduate        string
+	ClassID         uint
+	Logs            []logGorm.Log // Relasi One-to-Many dengan model Class
 }

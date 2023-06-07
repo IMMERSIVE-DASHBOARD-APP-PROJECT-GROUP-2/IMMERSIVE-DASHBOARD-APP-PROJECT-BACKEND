@@ -11,6 +11,20 @@ type classQuery struct {
 	db *gorm.DB
 }
 
+// DeleteClass implements class.ClassDataInterface.
+func (repo *classQuery) DeleteClass(classID uint) error {
+	var classData Class
+	if err := repo.db.First(&classData, classID).Error; err != nil {
+		return err
+	}
+
+	if err := repo.db.Delete(&classData).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // CreateClass implements class.ClassDataInterface.
 func (repo *classQuery) CreateClass(classInput class.Core) error {
 	// mapping dari struct entities core ke gorm model
