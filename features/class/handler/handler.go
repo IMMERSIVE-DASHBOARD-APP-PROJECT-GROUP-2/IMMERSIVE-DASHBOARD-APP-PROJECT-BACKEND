@@ -51,3 +51,20 @@ func (handler *ClassHandler) CreateClass(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, helper.SuccessResponse("success inserted data class"))
 }
+
+func (handler *ClassHandler) GetAllClass(c echo.Context) error {
+	//Memanggil function di Service logic via interface
+	results, err := handler.classService.GetAllClass()
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponse("error read data class"))
+	}
+	var classResponse []ClassResponse
+	for _, value := range results {
+		classResponse = append(classResponse, ClassResponse{
+			Id:     value.Id,
+			Name:   value.Name,
+			UserID: value.UserID,
+		})
+	}
+	return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("success read data class", classResponse))
+}
