@@ -17,9 +17,7 @@ import (
 
 func InitRoute(e *echo.Echo, db *gorm.DB) {
 	userData := _userData.New(db)
-
 	userService := _userService.New(userData)
-
 	userHandlerAPI := _userHandler.New(userService)
 
 	// // Register middleware
