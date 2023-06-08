@@ -63,19 +63,22 @@ func (handler *MenteeHandler) CreateMentee(c echo.Context) error {
 	return c.JSON(http.StatusOK, helper.SuccessResponse("success inserted data mentee"))
 }
 
-// func (handler *ClassHandler) GetAllClass(c echo.Context) error {
-// 	//Memanggil function di Service logic via interface
-// 	results, err := handler.classService.GetAllClass()
-// 	if err != nil {
-// 		return c.JSON(http.StatusBadRequest, helper.FailedResponse("error read data class"))
-// 	}
-// 	var classResponse []ClassResponse
-// 	for _, value := range results {
-// 		classResponse = append(classResponse, ClassResponse{
-// 			Id:     value.Id,
-// 			Name:   value.Name,
-// 			UserID: value.UserID,
-// 		})
-// 	}
-// 	return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("success read data class", classResponse))
-// }
+func (handler *MenteeHandler) GetAllMentee(c echo.Context) error {
+	//Memanggil function di Service logic via interface
+	results, err := handler.menteeService.GetAllMentee()
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponse("error read data mentee"))
+	}
+	var menteeResponse []MenteeResponse
+	for _, value := range results {
+		menteeResponse = append(menteeResponse, MenteeResponse{
+			Id:       value.Id,
+			ClassID:  value.ClassID,
+			Name:     value.Name,
+			Gender:   MenteeGender(value.Gender),
+			Category: MenteeCategory(value.Category),
+			Status:   MenteeStatus(value.Status),
+		})
+	}
+	return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("success read data class", menteeResponse))
+}

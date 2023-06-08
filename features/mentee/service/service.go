@@ -24,7 +24,8 @@ func (service *menteeService) CreateMentee(menteeInput mentee.Core) error {
 
 // GetAllMentee implements mentee.MenteeServiceInterface.
 func (service *menteeService) GetAllMentee() ([]mentee.Core, error) {
-	panic("unimplemented")
+	data, err := service.menteeData.GetAllMentee()
+	return data, err
 }
 
 func New(repo mentee.MenteeDataInterface) mentee.MenteeServiceInterface {

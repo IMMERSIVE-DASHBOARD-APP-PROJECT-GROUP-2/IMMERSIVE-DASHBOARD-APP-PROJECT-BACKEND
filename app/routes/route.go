@@ -52,5 +52,5 @@ func InitRoute(e *echo.Echo, db *gorm.DB) {
 
 	//EndPointMentee
 	e.POST("/mentees", menteeHandlerAPI.CreateMentee, middlewares.JWTMiddleware())
-	// e.GET("/classes", classHandlerAPI.GetAllClass, middlewares.JWTMiddleware())
+	e.GET("/mentees", menteeHandlerAPI.GetAllMentee, middlewares.JWTMiddleware())
 }
