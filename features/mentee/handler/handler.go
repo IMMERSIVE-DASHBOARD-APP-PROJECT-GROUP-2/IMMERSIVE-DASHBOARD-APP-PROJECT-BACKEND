@@ -129,3 +129,22 @@ func (handler *MenteeHandler) UpdateMentee(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, helper.SuccessResponse("Mentee updated successfully"))
 }
+
+func (handler *MenteeHandler) DeleteMentee(c echo.Context) error {
+	// Mendapatkan ID mentee dari parameter permintaan
+	id := c.Param("id")
+
+	// Konversi ID ke tipe uint menggunakan strconv.ParseUint
+	menteeID, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponse("Invalid mentee ID"))
+	}
+
+	// Menghapus mentee dari database
+	err = handler.menteeService.DeleteMentee(uint(menteeID))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to delete mentee"))
+	}
+
+	return c.JSON(http.StatusOK, helper.SuccessResponse("Mentee deleted successfully"))
+}

@@ -2,6 +2,7 @@ package data
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/DASHBOARDAPP/features/mentee"
 	"gorm.io/gorm"
@@ -9,6 +10,25 @@ import (
 
 type menteeQuery struct {
 	db *gorm.DB
+}
+
+func (query *menteeQuery) DeleteMentee(menteeID uint) error {
+	var mentee Mentee
+	result := query.db.Where("id = ?", menteeID).First(&mentee)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("record not found")
+		}
+		return fmt.Errorf("failed to find mentee: %v", result.Error)
+	}
+
+	// Soft delete the mentee by setting the "deleted_at" field
+	result = query.db.Delete(&mentee)
+	if result.Error != nil {
+		return fmt.Errorf("failed to delete mentee: %v", result.Error)
+	}
+
+	return nil
 }
 
 // UpdateMentee implements mentee.MenteeDataInterface.

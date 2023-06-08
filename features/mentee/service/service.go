@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/DASHBOARDAPP/features/mentee"
 
 	"github.com/go-playground/validator/v10"
@@ -9,6 +11,16 @@ import (
 type menteeService struct {
 	menteeData mentee.MenteeDataInterface
 	validate   *validator.Validate
+}
+
+// DeleteMentee implements mentee.MenteeServiceInterface.
+func (service *menteeService) DeleteMentee(menteeID uint) error {
+	err := service.menteeData.DeleteMentee(menteeID)
+	if err != nil {
+		return fmt.Errorf("error deleting mentee: %v", err)
+	}
+
+	return nil
 }
 
 // UpdateMentee implements mentee.MenteeServiceInterface.
