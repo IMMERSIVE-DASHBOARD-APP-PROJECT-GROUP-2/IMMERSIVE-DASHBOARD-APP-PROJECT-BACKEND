@@ -7,6 +7,7 @@ import (
 	"unicode"
 
 	"github.com/DASHBOARDAPP/features/user"
+	"github.com/DASHBOARDAPP/helper"
 	"github.com/go-playground/validator/v10"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -15,28 +16,6 @@ type userService struct {
 	userData user.UserDataInterface
 	validate *validator.Validate
 }
-
-// Create implements user.UserServiceInterface.
-func (service *userService) Create(user user.Core) error {
-	errValidate := service.validate.Struct(user)
-	if errValidate != nil {
-		return errValidate
-	}
-
-	// Generate hashed password
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return err
-	}
-
-	// Set the hashed password to the user input
-	user.Password = string(hashedPassword)
-
-	errInsert := service.userData.Insert(user)
-	return errInsert
-}
-
-// Create implements user.UserServiceInterface.
 
 // UpdateUserById implements user.UserServiceInterface.
 func (service *userService) UpdateUserById(id string, userInput user.Core) error {
@@ -150,32 +129,32 @@ func (service *userService) GetRoleByID(userID int) (user.UserRole, error) {
 	return user.UserRole(role), nil
 }
 
-// func (service *userService) Create(user user.Core, loggedInUserID int) error {
-// 	role, err := service.userData.GetRoleByID(loggedInUserID)
-// 	if err != nil {
-// 		return errors.New("Gagal mendapatkan role pengguna yang masuk")
-// 	}
+func (service *userService) Create(user user.Core, loggedInUserID int) error {
+	role, err := service.userData.GetRoleByID(loggedInUserID)
+	if err != nil {
+		return errors.New("Gagal mendapatkan role pengguna yang masuk")
+	}
 
-// 	if role != "admin" && user.Team != "manager" {
-// 		return errors.New("Hanya admin yang dapat membuat pengguna")
-// 	}
+	if role != "admin" && user.Team != "manager" {
+		return errors.New("Hanya admin yang dapat membuat pengguna")
+	}
 
-// 	// Generate hashed password
-// 	hashedPassword, err := helper.HashPassword(user.Password)
-// 	if err != nil {
-// 		return err
-// 	}
+	// Generate hashed password
+	hashedPassword, err := helper.HashPassword(user.Password)
+	if err != nil {
+		return err
+	}
 
-// 	// Set hashed password to user
-// 	user.Password = hashedPassword
+	// Set hashed password to user
+	user.Password = hashedPassword
 
-// 	// Call repository to insert user
-// 	err = service.userData.Insert(user)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return nil
-// }
+	// Call repository to insert user
+	err = service.userData.Insert(user)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 // GetAllUser implements user.UserServiceInterface.
 func (service *userService) GetAllUser(keyword string) ([]user.Core, error) {

@@ -26,11 +26,11 @@ func InitRoute(e *echo.Echo, db *gorm.DB) {
 	// // Register middleware
 	jwtMiddleware := middlewares.JWTMiddleware()
 
-	// // User Routes
+	// User Routes
 	e.POST("/login", userHandlerAPI.Login)
 	e.GET("/users", userHandlerAPI.GetAllUser, middlewares.JWTMiddleware())
 	e.PUT("/users/:id", userHandlerAPI.UpdateUserById, middlewares.JWTMiddleware())
-	e.POST("/users/role", userHandlerAPI.CreateUser)
+	e.POST("/users/role", userHandlerAPI.CreateUser, jwtMiddleware)
 	e.PUT("/users/role/:id", userHandlerAPI.UpdateUser, jwtMiddleware)
 	e.DELETE("/users/role/:id", userHandlerAPI.DeleteUser, jwtMiddleware)
 
@@ -40,7 +40,7 @@ func InitRoute(e *echo.Echo, db *gorm.DB) {
 
 	classHandlerAPI := _classHandler.New(classService)
 
-	//EndPointBook
+	//EndPointClass
 	e.POST("/classes", classHandlerAPI.CreateClass, middlewares.JWTMiddleware())
 	e.GET("/classes", classHandlerAPI.GetAllClass, middlewares.JWTMiddleware())
 	e.PUT("/classes/:id", classHandlerAPI.UpdateClassById, middlewares.JWTMiddleware())

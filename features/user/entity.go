@@ -62,8 +62,7 @@ type UserDataInterface interface {
 
 type UserServiceInterface interface {
 	GetRoleByID(userID int) (UserRole, error)
-	Create(user Core) error
-	// Create(user Core, loggedInUserID int) error
+	Create(user Core, loggedInUserID int) error
 	Login(email, password string) (Core, string, error)
 	GetAllUser(keyword string) ([]Core, error)
 	Update(userID int, updatedUser Core, loggedInUserID int) error
