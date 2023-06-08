@@ -64,8 +64,11 @@ func (handler *MenteeHandler) CreateMentee(c echo.Context) error {
 }
 
 func (handler *MenteeHandler) GetAllMentee(c echo.Context) error {
+	// Get the "search" query parameter
+	keyword := c.QueryParam("Search")
+
 	//Memanggil function di Service logic via interface
-	results, err := handler.menteeService.GetAllMentee()
+	results, err := handler.menteeService.GetAllMentee(keyword)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, helper.FailedResponse("error read data mentee"))
 	}

@@ -37,10 +37,15 @@ func (repo *classQuery) UpdateClassById(id string, classInput class.Core) error 
 }
 
 // GetAllClass implements class.ClassDataInterface.
-func (repo *classQuery) GetAllClass() ([]class.Core, error) {
+func (repo *classQuery) GetAllClass(keyword string) ([]class.Core, error) {
 	var classData []Class
 	// Mencari data user di database
-	tx := repo.db.Find(&classData)
+	tx := repo.db
+	if keyword != "" {
+		tx = tx.Where("id LIKE ?", "%"+keyword+"%").
+			Or("name LIKE ?", "%"+keyword+"%")
+	}
+	tx = tx.Find(&classData)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}

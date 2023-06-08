@@ -27,8 +27,8 @@ func (service *classService) UpdateClassById(id string, classInput class.Core) e
 }
 
 // GetAllClass implements class.ClassServiceInterface.
-func (service *classService) GetAllClass() ([]class.Core, error) {
-	data, err := service.classData.GetAllClass()
+func (service *classService) GetAllClass(keyword string) ([]class.Core, error) {
+	data, err := service.classData.GetAllClass(keyword)
 	return data, err
 }
 

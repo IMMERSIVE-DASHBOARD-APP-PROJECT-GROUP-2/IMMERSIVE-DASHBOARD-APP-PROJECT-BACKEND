@@ -43,31 +43,31 @@ type Core struct {
 	UpdatedAt time.Time
 	DeletedAt time.Time
 	// MainData
-	Name        string       `json:"name" form:"name" validate:"required"`
-	Address     string       `json:"address" form:"address" validate:"required"`
-	HomeAddress string       `json:"current_address" form:"current_address" validate:"required"`
-	Email       string       `json:"email" form:"email" validate:"required,email"`
-	Gender      MenteeGender `json:"gender" form:"gender" validate:"required"`
-	Telegram    string       `json:"telegram" form:"telegram" validate:"required"`
-	Phone       string       `json:"phone" form:"phone" validate:"required"`
-	Status      MenteeStatus `json:"status" form:"status" validate:"required"`
+	Name        string       `json:"name" form:"name"`
+	Address     string       `json:"address" form:"address"`
+	HomeAddress string       `json:"current_address" form:"current_address"`
+	Email       string       `json:"email" form:"email"`
+	Gender      MenteeGender `json:"gender" form:"gender"`
+	Telegram    string       `json:"telegram" form:"telegram"`
+	Phone       string       `json:"phone" form:"phone"`
+	Status      MenteeStatus `json:"status" form:"status"`
 	// EmergencyData
 	EmergencyName   string          `json:"emergency_name" form:"emergency_name"`
 	EmergencyStatus EmergencyStatus `json:"emergency_status" form:"emergency_status"`
 	EmergencyPhone  string          `json:"emergency_phone" form:"emergency_phone"`
 	// EducationData
-	Category  MenteeCategory `json:"education_type" form:"education_type" validate:"required"`
+	Category  MenteeCategory `json:"education_type" form:"education_type"`
 	Major     string         `json:"major" form:"major" validate:"required"`
-	Graduated string         `json:"graduated" form:"graduated" validate:"required"`
-	ClassID   uint           `json:"class_id" form:"class_id" validate:"required"`
+	Graduated string         `json:"graduated" form:"graduated"`
+	ClassID   uint           `json:"class_id" form:"class_id"`
 }
 
 type MenteeDataInterface interface {
 	CreateMentee(menteeInput Core) error
-	GetAllMentee() ([]Core, error)
+	GetAllMentee(keyword string) ([]Core, error)
 }
 
 type MenteeServiceInterface interface {
 	CreateMentee(menteeInput Core) error
-	GetAllMentee() ([]Core, error)
+	GetAllMentee(keyword string) ([]Core, error)
 }

@@ -23,8 +23,8 @@ func (service *menteeService) CreateMentee(menteeInput mentee.Core) error {
 }
 
 // GetAllMentee implements mentee.MenteeServiceInterface.
-func (service *menteeService) GetAllMentee() ([]mentee.Core, error) {
-	data, err := service.menteeData.GetAllMentee()
+func (service *menteeService) GetAllMentee(keyword string) ([]mentee.Core, error) {
+	data, err := service.menteeData.GetAllMentee(keyword)
 	return data, err
 }
 

@@ -112,10 +112,18 @@ func (repo *userQuery) Insert(user user.Core) error {
 }
 
 // GetAllUser implements user.UserDataInterface.
-func (repo *userQuery) GetAllUser() ([]user.Core, error) {
+func (repo *userQuery) GetAllUser(keyword string) ([]user.Core, error) {
 	var userData []User
-	// Mencari data user di database
-	tx := repo.db.Find(&userData)
+	tx := repo.db
+	if keyword != "" {
+		tx = tx.Where("id LIKE ?", "%"+keyword+"%").
+			Or("name LIKE ?", "%"+keyword+"%").
+			Or("email LIKE ?", "%"+keyword+"%").
+			Or("team LIKE ?", "%"+keyword+"%").
+			Or("role LIKE ?", "%"+keyword+"%").
+			Or("status LIKE ?", "%"+keyword+"%")
+	}
+	tx = tx.Find(&userData)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}

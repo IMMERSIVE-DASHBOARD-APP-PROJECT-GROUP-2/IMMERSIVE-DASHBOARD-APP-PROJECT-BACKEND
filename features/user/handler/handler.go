@@ -48,8 +48,10 @@ func (handler *UserHandler) Login(c echo.Context) error {
 }
 
 func (handler *UserHandler) GetAllUser(c echo.Context) error {
+	// Get the "search" query parameter
+	keyword := c.QueryParam("Search")
 	//Memanggil function di Service logic via interface
-	results, err := handler.userService.GetAllUser()
+	results, err := handler.userService.GetAllUser(keyword)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, helper.FailedResponse("error read data user"))
 	}

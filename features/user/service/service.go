@@ -157,8 +157,8 @@ func (service *userService) Create(user user.Core, loggedInUserID int) error {
 }
 
 // GetAllUser implements user.UserServiceInterface.
-func (service *userService) GetAllUser() ([]user.Core, error) {
-	data, err := service.userData.GetAllUser()
+func (service *userService) GetAllUser(keyword string) ([]user.Core, error) {
+	data, err := service.userData.GetAllUser(keyword)
 	return data, err
 }
 

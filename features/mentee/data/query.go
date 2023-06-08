@@ -26,10 +26,20 @@ func (repo *menteeQuery) CreateMentee(menteeInput mentee.Core) error {
 }
 
 // GetAllMentee implements mentee.MenteeDataInterface.
-func (repo *menteeQuery) GetAllMentee() ([]mentee.Core, error) {
+func (repo *menteeQuery) GetAllMentee(keyword string) ([]mentee.Core, error) {
 	var menteeData []Mentee
-	// Mencari data user di database
-	tx := repo.db.Preload("Class").Find(&menteeData)
+	// Mencari data mentee di database
+	tx := repo.db
+	if keyword != "" {
+		tx = tx.Where("id LIKE ?", "%"+keyword+"%").
+			Or("name LIKE ?", "%"+keyword+"%").
+			Or("email LIKE ?", "%"+keyword+"%").
+			Or("class_id LIKE ?", "%"+keyword+"%").
+			Or("status LIKE ?", "%"+keyword+"%").
+			Or("category LIKE ?", "%"+keyword+"%").
+			Or("gender LIKE ?", "%"+keyword+"%")
+	}
+	tx = tx.Find(&menteeData)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}

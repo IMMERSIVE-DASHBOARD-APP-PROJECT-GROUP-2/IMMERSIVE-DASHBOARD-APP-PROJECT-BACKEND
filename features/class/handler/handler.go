@@ -53,8 +53,11 @@ func (handler *ClassHandler) CreateClass(c echo.Context) error {
 }
 
 func (handler *ClassHandler) GetAllClass(c echo.Context) error {
+	// Get the "search" query parameter
+	keyword := c.QueryParam("Search")
+
 	//Memanggil function di Service logic via interface
-	results, err := handler.classService.GetAllClass()
+	results, err := handler.classService.GetAllClass(keyword)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, helper.FailedResponse("error read data class"))
 	}
