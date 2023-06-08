@@ -65,9 +65,18 @@ type Core struct {
 type MenteeDataInterface interface {
 	CreateMentee(menteeInput Core) error
 	GetAllMentee(keyword string) ([]Core, error)
+	UpdateMentee(menteeInput Core) error
+	DeleteMentee(menteeID uint) error
+	GetMenteeByID(menteeID uint) (*Core, error)
 }
 
 type MenteeServiceInterface interface {
 	CreateMentee(menteeInput Core) error
+<<<<<<< HEAD
 	GetAllMentee(keyword string) ([]Core, error)
+=======
+	GetAllMentee() ([]Core, error)
+	UpdateMentee(menteeInput Core) error
+	DeleteMentee(menteeID uint) error
+>>>>>>> CreateLog
 }

@@ -2,6 +2,7 @@ package data
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/DASHBOARDAPP/features/mentee"
 	"gorm.io/gorm"
@@ -9,6 +10,71 @@ import (
 
 type menteeQuery struct {
 	db *gorm.DB
+}
+
+// GetMenteeByID implements mentee.MenteeDataInterface.
+func (repo *menteeQuery) GetMenteeByID(menteeID uint) (*mentee.Core, error) {
+	menteeData := &mentee.Core{}
+	err := repo.db.Preload("Logs").First(menteeData, menteeID).Error
+	if err != nil {
+		return nil, err
+	}
+	return menteeData, nil
+}
+
+func (query *menteeQuery) DeleteMentee(menteeID uint) error {
+	var mentee Mentee
+	result := query.db.Where("id = ?", menteeID).First(&mentee)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("record not found")
+		}
+		return fmt.Errorf("failed to find mentee: %v", result.Error)
+	}
+
+	// Soft delete the mentee by setting the "deleted_at" field
+	result = query.db.Delete(&mentee)
+	if result.Error != nil {
+		return fmt.Errorf("failed to delete mentee: %v", result.Error)
+	}
+
+	return nil
+}
+
+// UpdateMentee implements mentee.MenteeDataInterface.
+func (repo *menteeQuery) UpdateMentee(menteeInput mentee.Core) error {
+	menteeToUpdate := Mentee{}
+	// Cari entri mentee berdasarkan ID
+	if err := repo.db.First(&menteeToUpdate, menteeInput.Id).Error; err != nil {
+		return err
+	}
+
+	// Mapping data dari menteeInput ke menteeToUpdate menggunakan fungsi CoreToModel
+	updatedMentee := CoreToModel(&menteeInput)
+
+	// Perbarui data menteeToUpdate dengan data baru dari updatedMentee
+	menteeToUpdate.Name = updatedMentee.Name
+	menteeToUpdate.Address = updatedMentee.Address
+	menteeToUpdate.HomeAddress = updatedMentee.HomeAddress
+	menteeToUpdate.Email = updatedMentee.Email
+	menteeToUpdate.Gender = updatedMentee.Gender
+	menteeToUpdate.Telegram = updatedMentee.Telegram
+	menteeToUpdate.Phone = updatedMentee.Phone
+	menteeToUpdate.Status = updatedMentee.Status
+	menteeToUpdate.EmergencyName = updatedMentee.EmergencyName
+	menteeToUpdate.EmergencyStatus = updatedMentee.EmergencyStatus
+	menteeToUpdate.EmergencyPhone = updatedMentee.EmergencyPhone
+	menteeToUpdate.Category = updatedMentee.Category
+	menteeToUpdate.Major = updatedMentee.Major
+	menteeToUpdate.Graduated = updatedMentee.Graduated
+	menteeToUpdate.ClassID = updatedMentee.ClassID
+
+	// Simpan perubahan ke database
+	if err := repo.db.Save(&menteeToUpdate).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // CreateMentee implements mentee.MenteeDataInterface.

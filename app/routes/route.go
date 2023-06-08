@@ -5,6 +5,9 @@ import (
 	_classData "github.com/DASHBOARDAPP/features/class/data"
 	_classHandler "github.com/DASHBOARDAPP/features/class/handler"
 	_classService "github.com/DASHBOARDAPP/features/class/service"
+	_logData "github.com/DASHBOARDAPP/features/log/data"
+	_logHandler "github.com/DASHBOARDAPP/features/log/handler"
+	_logService "github.com/DASHBOARDAPP/features/log/service"
 	_menteeData "github.com/DASHBOARDAPP/features/mentee/data"
 	_menteeHandler "github.com/DASHBOARDAPP/features/mentee/handler"
 	_menteeService "github.com/DASHBOARDAPP/features/mentee/service"
@@ -27,7 +30,7 @@ func InitRoute(e *echo.Echo, db *gorm.DB) {
 	e.POST("/login", userHandlerAPI.Login)
 	e.GET("/users", userHandlerAPI.GetAllUser, middlewares.JWTMiddleware())
 	e.PUT("/users/:id", userHandlerAPI.UpdateUserById, middlewares.JWTMiddleware())
-	e.POST("/users/role", userHandlerAPI.CreateUser, jwtMiddleware)
+	e.POST("/users/role", userHandlerAPI.CreateUser)
 	e.PUT("/users/role/:id", userHandlerAPI.UpdateUser, jwtMiddleware)
 	e.DELETE("/users/role/:id", userHandlerAPI.DeleteUser, jwtMiddleware)
 
@@ -51,4 +54,16 @@ func InitRoute(e *echo.Echo, db *gorm.DB) {
 	//EndPointMentee
 	e.POST("/mentees", menteeHandlerAPI.CreateMentee, middlewares.JWTMiddleware())
 	e.GET("/mentees", menteeHandlerAPI.GetAllMentee, middlewares.JWTMiddleware())
+	e.PUT("/mentees/:id", menteeHandlerAPI.UpdateMentee, middlewares.JWTMiddleware())
+	e.DELETE("/mentees/:id", menteeHandlerAPI.DeleteMentee, middlewares.JWTMiddleware())
+
+	logData := _logData.New(db)
+
+	logService := _logService.New(logData)
+
+	logHandlerAPI := _logHandler.New(logService)
+
+	// Log Routes
+	e.POST("/logs", logHandlerAPI.CreateLog, middlewares.JWTMiddleware())
+	e.GET("/logs", logHandlerAPI.GetLogsByMenteeID, middlewares.JWTMiddleware())
 }

@@ -14,6 +14,16 @@ type userQuery struct {
 	db *gorm.DB
 }
 
+// GetUserByID implements user.UserDataInterface.
+func (repo *userQuery) GetUserByID(userID uint) (*user.Core, error) {
+	var userData user.Core
+	err := repo.db.First(&userData, userID).Error
+	if err != nil {
+		return nil, err
+	}
+	return &userData, nil
+}
+
 // UpdateUserById implements user.UserDataInterface.
 func (repo *userQuery) UpdateUserById(id string, userInput user.Core) error {
 	// Mencari pengguna berdasarkan ID
