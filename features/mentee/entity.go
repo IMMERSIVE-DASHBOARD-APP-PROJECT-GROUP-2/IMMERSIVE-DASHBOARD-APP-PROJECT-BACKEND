@@ -65,9 +65,11 @@ type Core struct {
 type MenteeDataInterface interface {
 	CreateMentee(menteeInput Core) error
 	GetAllMentee() ([]Core, error)
+	UpdateMentee(menteeInput Core) error
 }
 
 type MenteeServiceInterface interface {
 	CreateMentee(menteeInput Core) error
 	GetAllMentee() ([]Core, error)
+	UpdateMentee(menteeInput Core) error
 }

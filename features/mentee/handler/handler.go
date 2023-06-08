@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/DASHBOARDAPP/features/mentee"
@@ -81,4 +82,50 @@ func (handler *MenteeHandler) GetAllMentee(c echo.Context) error {
 		})
 	}
 	return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("success read data class", menteeResponse))
+}
+
+func (handler *MenteeHandler) UpdateMentee(c echo.Context) error {
+	// Mendapatkan ID mentee dari parameter permintaan
+	id := c.Param("id")
+
+	// Konversi ID ke tipe int menggunakan strconv.Atoi
+	menteeID, err := strconv.Atoi(id)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponse("Invalid mentee ID"))
+	}
+
+	// bind, membaca data yang dikirimkan client via request body
+	menteeInput := MenteeRequest{}
+	errBind := c.Bind(&menteeInput)
+	if errBind != nil {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponse("Error binding data"))
+	}
+
+	// Mapping input ke data core
+	menteeCore := mentee.Core{
+		Id:              uint(menteeID),
+		Name:            menteeInput.Name,
+		Address:         menteeInput.Address,
+		HomeAddress:     menteeInput.HomeAddress,
+		Email:           menteeInput.Email,
+		Gender:          mentee.MenteeGender(menteeInput.Gender),
+		Telegram:        menteeInput.Telegram,
+		Phone:           menteeInput.Phone,
+		Status:          mentee.MenteeStatus(menteeInput.Status),
+		EmergencyName:   menteeInput.EmergencyName,
+		EmergencyStatus: mentee.EmergencyStatus(menteeInput.EmergencyStatus),
+		EmergencyPhone:  menteeInput.EmergencyPhone,
+		Category:        mentee.MenteeCategory(menteeInput.Category),
+		Major:           menteeInput.Major,
+		Graduated:       menteeInput.Graduated,
+		ClassID:         menteeInput.ClassID,
+	}
+
+	// Memperbarui mentee di database
+	err = handler.menteeService.UpdateMentee(menteeCore)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, helper.FailedResponse("Failed to update mentee"))
+	}
+
+	return c.JSON(http.StatusOK, helper.SuccessResponse("Mentee updated successfully"))
 }

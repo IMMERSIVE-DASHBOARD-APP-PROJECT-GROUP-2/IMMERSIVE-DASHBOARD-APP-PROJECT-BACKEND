@@ -11,6 +11,21 @@ type menteeService struct {
 	validate   *validator.Validate
 }
 
+// UpdateMentee implements mentee.MenteeServiceInterface.
+func (service *menteeService) UpdateMentee(menteeInput mentee.Core) error {
+	errValidate := service.validate.Struct(menteeInput)
+	if errValidate != nil {
+		return errValidate
+	}
+
+	// Memanggil fungsi UpdateMentee dari data repository untuk melakukan pembaruan data
+	if err := service.menteeData.UpdateMentee(menteeInput); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // CreateMentee implements mentee.MenteeServiceInterface.
 func (service *menteeService) CreateMentee(menteeInput mentee.Core) error {
 	errValidate := service.validate.Struct(menteeInput)
