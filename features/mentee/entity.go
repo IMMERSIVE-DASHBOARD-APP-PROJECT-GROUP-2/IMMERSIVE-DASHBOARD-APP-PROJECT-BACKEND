@@ -67,6 +67,7 @@ type MenteeDataInterface interface {
 	GetAllMentee() ([]Core, error)
 	UpdateMentee(menteeInput Core) error
 	DeleteMentee(menteeID uint) error
+	GetMenteeByID(menteeID uint) (*Core, error)
 }
 
 type MenteeServiceInterface interface {

@@ -67,43 +67,43 @@ func (handler *UserHandler) GetAllUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, helper.SuccessWithDataResponse("success read data user", userResponse))
 }
 
-func (handler *UserHandler) CreateUser(c echo.Context) error {
-	// Mendapatkan data pengguna dari permintaan
-	userInput := UserRequest{}
-	err := c.Bind(&userInput)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, helper.FailedResponse("error bind data"))
-	}
+// func (handler *UserHandler) CreateUser(c echo.Context) error {
+// 	// Mendapatkan data pengguna dari permintaan
+// 	userInput := UserRequest{}
+// 	err := c.Bind(&userInput)
+// 	if err != nil {
+// 		return c.JSON(http.StatusBadRequest, helper.FailedResponse("error bind data"))
+// 	}
 
-	// Mendapatkan ID pengguna yang login
-	loggedInUserID, err := middlewares.ExtractTokenUserId(c)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, helper.FailedResponse("gagal mendapatkan ID pengguna"))
-	}
+// 	// // Mendapatkan ID pengguna yang login
+// 	loggedInUserID, err := middlewares.ExtractTokenUserId(c)
+// 	if err != nil {
+// 		return c.JSON(http.StatusInternalServerError, helper.FailedResponse("gagal mendapatkan ID pengguna"))
+// 	}
 
-	// Membuat data pengguna
-	user := user.Core{
-		Name:     userInput.Name,
-		Phone:    userInput.Phone,
-		Email:    userInput.Email,
-		Password: userInput.Password,
-		Role:     user.UserRole(userInput.Role),
-		Status:   user.UserStatus(userInput.Status),
-		Team:     user.UserTeam(userInput.Team),
-	}
+// 	// Membuat data pengguna
+// 	user := user.Core{
+// 		Name:     userInput.Name,
+// 		Phone:    userInput.Phone,
+// 		Email:    userInput.Email,
+// 		Password: userInput.Password,
+// 		Role:     user.UserRole(userInput.Role),
+// 		Status:   user.UserStatus(userInput.Status),
+// 		Team:     user.UserTeam(userInput.Team),
+// 	}
 
-	// Memanggil service untuk menambahkan pengguna
-	err = handler.userService.Create(user, loggedInUserID)
-	if err != nil {
-		if strings.Contains(err.Error(), "validation") {
-			return c.JSON(http.StatusBadRequest, helper.FailedResponse(err.Error()))
-		} else {
-			return c.JSON(http.StatusInternalServerError, helper.FailedResponse("gagal insert data"+err.Error()))
-		}
-	}
+// 	// Memanggil service untuk menambahkan pengguna
+// 	err = handler.userService.Create(user, loggedInUserID)
+// 	if err != nil {
+// 		if strings.Contains(err.Error(), "validation") {
+// 			return c.JSON(http.StatusBadRequest, helper.FailedResponse(err.Error()))
+// 		} else {
+// 			return c.JSON(http.StatusInternalServerError, helper.FailedResponse("gagal insert data"+err.Error()))
+// 		}
+// 	}
 
-	return c.JSON(http.StatusOK, helper.SuccessResponse("sukses insert data"))
-}
+// 	return c.JSON(http.StatusOK, helper.SuccessResponse("sukses insert data"))
+// }
 
 func (handler *UserHandler) UpdateUser(c echo.Context) error {
 	// Get the ID of the user to be updated
@@ -194,6 +194,9 @@ func (handler *UserHandler) UpdateUserById(c echo.Context) error {
 		Phone:    userInput.Phone,
 		Email:    userInput.Email,
 		Password: userInput.Password,
+		Role:     user.UserRole(userInput.Role),
+		Status:   user.UserStatus(userInput.Status),
+		Team:     user.UserTeam(userInput.Team),
 	}
 	err = handler.userService.UpdateUserById(id, userCore)
 	if err != nil {
@@ -204,4 +207,32 @@ func (handler *UserHandler) UpdateUserById(c echo.Context) error {
 		}
 	}
 	return c.JSON(http.StatusOK, helper.SuccessResponse("success updated data user"))
+}
+
+func (handler *UserHandler) CreateUser(c echo.Context) error {
+	userInput := UserRequest{}
+
+	errBind := c.Bind(&userInput)
+	if errBind != nil {
+		return c.JSON(http.StatusBadRequest, helper.FailedResponse("error bind data"))
+	}
+
+	userCore := user.Core{
+		Name:     userInput.Name,
+		Phone:    userInput.Phone,
+		Email:    userInput.Email,
+		Password: userInput.Password,
+		Role:     user.UserRole(userInput.Role),
+		Status:   user.UserStatus(userInput.Status),
+		Team:     user.UserTeam(userInput.Team),
+	}
+	err := handler.userService.Create(userCore)
+	if err != nil {
+		if strings.Contains(err.Error(), "validation") {
+			return c.JSON(http.StatusBadRequest, helper.FailedResponse(err.Error()))
+		} else {
+			return c.JSON(http.StatusInternalServerError, helper.FailedResponse("error insert data"+err.Error()))
+		}
+	}
+	return c.JSON(http.StatusOK, helper.SuccessResponse("success insert data"))
 }

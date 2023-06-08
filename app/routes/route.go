@@ -32,7 +32,7 @@ func InitRoute(e *echo.Echo, db *gorm.DB) {
 	e.POST("/login", userHandlerAPI.Login)
 	e.GET("/users", userHandlerAPI.GetAllUser, middlewares.JWTMiddleware())
 	e.PUT("/users/:id", userHandlerAPI.UpdateUserById, middlewares.JWTMiddleware())
-	e.POST("/users/role", userHandlerAPI.CreateUser, jwtMiddleware)
+	e.POST("/users/role", userHandlerAPI.CreateUser)
 	e.PUT("/users/role/:id", userHandlerAPI.UpdateUser, jwtMiddleware)
 	e.DELETE("/users/role/:id", userHandlerAPI.DeleteUser, jwtMiddleware)
 
@@ -67,4 +67,5 @@ func InitRoute(e *echo.Echo, db *gorm.DB) {
 
 	// Log Routes
 	e.POST("/logs", logHandlerAPI.CreateLog, middlewares.JWTMiddleware())
+	e.GET("/logs", logHandlerAPI.GetLogsByMenteeID, middlewares.JWTMiddleware())
 }

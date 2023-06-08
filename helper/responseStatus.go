@@ -7,8 +7,8 @@ func FailedResponse(message string) map[string]any {
 	}
 }
 
-func SuccessResponse(message string) map[string]any {
-	return map[string]any{
+func SuccessResponse(message string) map[string]interface{} {
+	return map[string]interface{}{
 		"status":  "success",
 		"message": message,
 	}

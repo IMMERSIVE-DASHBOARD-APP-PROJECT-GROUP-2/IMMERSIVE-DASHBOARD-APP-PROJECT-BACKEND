@@ -52,6 +52,7 @@ type UpdatedInput struct {
 type UserDataInterface interface {
 	Insert(user Core) error
 	Login(email, password string) (Core, string, error)
+	GetUserByID(userID uint) (*Core, error)
 	GetAllUser() ([]Core, error)
 	GetRoleByID(userID int) (UserRole, error)
 	Update(userID int, updatedUser Core) error
@@ -61,7 +62,8 @@ type UserDataInterface interface {
 
 type UserServiceInterface interface {
 	GetRoleByID(userID int) (UserRole, error)
-	Create(user Core, loggedInUserID int) error
+	Create(user Core) error
+	// Create(user Core, loggedInUserID int) error
 	Login(email, password string) (Core, string, error)
 	GetAllUser() ([]Core, error)
 	Update(userID int, updatedUser Core, loggedInUserID int) error

@@ -4,12 +4,37 @@ import (
 	"errors"
 
 	"github.com/DASHBOARDAPP/features/log"
+	"github.com/DASHBOARDAPP/features/mentee"
+	"github.com/DASHBOARDAPP/features/user"
 	"github.com/go-playground/validator/v10"
 )
 
 type logService struct {
-	logData  log.LogDataInterface
-	validate *validator.Validate
+	logData    log.LogDataInterface
+	menteeData mentee.MenteeDataInterface
+	userData   user.UserDataInterface
+	validate   *validator.Validate
+}
+
+// GetLogsByID implements log.LogServiceInterface.
+func (*logService) GetLogsByID(logID uint) ([]log.Core, error) {
+	panic("unimplemented")
+}
+
+func (service *logService) GetLogsByMenteeID(menteeID uint) ([]log.Core, error) {
+	_, err := service.menteeData.GetMenteeByID(menteeID)
+	if err != nil {
+		// Handle error
+		return nil, err
+	}
+
+	logs, err := service.logData.GetLogsByMenteeID(menteeID)
+	if err != nil {
+		// Handle error
+		return nil, err
+	}
+
+	return logs, nil
 }
 
 // CreateLog implements log.LogServiceInterface.

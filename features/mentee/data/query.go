@@ -12,6 +12,16 @@ type menteeQuery struct {
 	db *gorm.DB
 }
 
+// GetMenteeByID implements mentee.MenteeDataInterface.
+func (repo *menteeQuery) GetMenteeByID(menteeID uint) (*mentee.Core, error) {
+	menteeData := &mentee.Core{}
+	err := repo.db.Preload("Logs").First(menteeData, menteeID).Error
+	if err != nil {
+		return nil, err
+	}
+	return menteeData, nil
+}
+
 func (query *menteeQuery) DeleteMentee(menteeID uint) error {
 	var mentee Mentee
 	result := query.db.Where("id = ?", menteeID).First(&mentee)
