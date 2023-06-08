@@ -72,11 +72,7 @@ type MenteeDataInterface interface {
 
 type MenteeServiceInterface interface {
 	CreateMentee(menteeInput Core) error
-<<<<<<< HEAD
 	GetAllMentee(keyword string) ([]Core, error)
-=======
-	GetAllMentee() ([]Core, error)
 	UpdateMentee(menteeInput Core) error
 	DeleteMentee(menteeID uint) error
->>>>>>> CreateLog
 }
